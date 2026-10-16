@@ -4,12 +4,12 @@
  */
 import { business } from '../data/business';
 import { categories, menuByCategory } from '../data/menu';
-import { SITE_URL } from '../config/site';
+import { absoluteUrl } from './url';
 
 const DAY = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const;
 
 export function restaurantSchema() {
-  const url = new URL('/', SITE_URL).href;
+  const url = absoluteUrl('/');
 
   // Group weekdays with identical hours. A shift that closes after midnight keeps
   // its "closes" time (e.g. Friday opens 08:00, closes 01:00), as Google documents.
@@ -56,8 +56,8 @@ export function restaurantSchema() {
     alternateName: business.shortName,
     slogan: business.tagline,
     url,
-    image: [new URL('/og-image.jpg', SITE_URL).href],
-    logo: new URL('/logo.png', SITE_URL).href,
+    image: [absoluteUrl('/og-image.jpg')],
+    logo: absoluteUrl('/logo.png'),
     telephone: business.phone.international.replace(/\s/g, ''),
     address: {
       '@type': 'PostalAddress',

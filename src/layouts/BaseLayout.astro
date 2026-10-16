@@ -8,6 +8,7 @@ import '../styles/tokens.css';
 import '../styles/base.css';
 // Only the above-the-fold heading weight is preloaded (hashed URL via Vite).
 import headingFont from '../assets/fonts/fraunces-500-core.woff2?url';
+import { IS_PREVIEW, absoluteUrl, withBase } from '../lib/url';
 
 interface Props {
   title: string;
@@ -18,7 +19,8 @@ interface Props {
 }
 const { title, description, noindex = false, jsonLd, intro = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
-const ogImage = new URL('/og-image.jpg', Astro.site).href;
+const ogImage = absoluteUrl('/og-image.jpg');
+const robots = noindex || IS_PREVIEW;
 ---
 
 <!doctype html>
@@ -29,7 +31,7 @@ const ogImage = new URL('/og-image.jpg', Astro.site).href;
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex" />}
+    {robots && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#121110" />
     <meta name="format-detection" content="telephone=no" />
 
@@ -57,10 +59,10 @@ const ogImage = new URL('/og-image.jpg', Astro.site).href;
 
     <link rel="preload" href={headingFont} as="font" type="font/woff2" crossorigin />
     <slot name="head" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <link rel="icon" href={withBase('/favicon-32.png')} sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
+    <link rel="manifest" href={withBase('/manifest.webmanifest')} />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Pastai Bar & Restaurant" />

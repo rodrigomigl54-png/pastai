@@ -1,239 +1,71 @@
 ---
-/**
- * PHASE 1 STYLE TILE — temporary. Replaced by the real one-page site in
- * phase 3+. It verifies tokens, fonts, the vectorised logo and the asset
- * audit inside a real Astro build. Marked noindex.
- */
-import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { business } from '../data/business';
-import logoParts from '../assets/brand/logo-parts.svg?raw';
+import DoughDefs from '../components/ui/DoughDefs.astro';
+import MotifSprite from '../components/menu/motifs/MotifSprite.astro';
+import Intro from '../components/intro/Intro.astro';
+import Header from '../components/sections/Header.astro';
+import Hero from '../components/sections/Hero.astro';
+import About from '../components/sections/About.astro';
+import Specialty from '../components/sections/Specialty.astro';
+import Menu from '../components/menu/Menu.astro';
+import Gallery from '../components/sections/Gallery.astro';
+import Garden from '../components/sections/Garden.astro';
+import Events from '../components/sections/Events.astro';
+import Reviews from '../components/sections/Reviews.astro';
+import Reservation from '../components/sections/Reservation.astro';
+import Delivery from '../components/sections/Delivery.astro';
+import Location from '../components/sections/Location.astro';
+import Footer from '../components/sections/Footer.astro';
+import ActionBar from '../components/sections/ActionBar.astro';
+import Thread from '../components/thread/Thread.astro';
+import { restaurantSchema } from '../lib/schema';
+import { getImage } from 'astro:assets';
+import { getPhoto, widthsFor } from '../lib/photos';
+import { HERO_PHOTO, HERO_QUALITY, HERO_SIZES } from '../components/sections/hero-config';
 
-const photos = import.meta.glob<{ default: ImageMetadata }>('../assets/raw/gallery/*.jpg', { eager: true });
-const gallery = Object.entries(photos).map(([path, mod]) => ({
-  name: path.split('/').pop()!.replace('.jpg', ''),
-  img: mod.default,
-}));
+// Preload the hero (LCP) image so it is fetched before the parser reaches it.
+const heroImg = getPhoto(HERO_PHOTO);
+const heroAvif = await getImage({ src: heroImg, format: 'avif', widths: widthsFor(heroImg), quality: HERO_QUALITY, sizes: HERO_SIZES });
 
-const swatches = [
-  { token: '--ink', hex: '#121110', on: '--dough', ratio: '15.52' },
-  { token: '--dough', hex: '#F2E8D5', on: '--ink', ratio: '15.52' },
-  { token: '--dough-deep', hex: '#E6D6B8', on: '--ink', ratio: '13.18' },
-  { token: '--tomato', hex: '#C63A22', on: '#FFFFFF', ratio: '5.21' },
-  { token: '--basil', hex: '#3E6B3A', on: '--dough', ratio: '5.13' },
-  { token: '--basil-soft', hex: '#DCE5D2', on: '--ink', ratio: '14.53' },
-];
+const title = 'Pastai Bar & Restaurant | Domaća pasta u centru Novog Sada';
+const description =
+  'Pasta bar na Trgu republike, u Ribljoj pijaci u Novom Sadu: domaća pasta, bašta i dostava. Rezervišite sto preko WhatsApp-a.';
 ---
 
-<BaseLayout
-  title="Pastai — faza 1: vizuelni tokeni"
-  description="Interni pregled dizajn tokena za sajt Pastai Bar & Restaurant."
-  noindex
->
+<BaseLayout title={title} description={description} jsonLd={restaurantSchema()} intro>
+  <link
+    slot="head"
+    rel="preload"
+    as="image"
+    type="image/avif"
+    imagesrcset={heroAvif.srcSet.attribute}
+    imagesizes={HERO_SIZES}
+    fetchpriority="high"
+  />
+  <Intro />
+  <Header />
   <main id="sadrzaj">
-    <section class="section theme-ink hero">
-      <div class="container hero__grid">
-        <div class="logo" set:html={logoParts} />
-        <div>
-          <p class="eyebrow">Faza 1 · Nit testa</p>
-          <h1>{business.tagline}</h1>
-          <p class="lead">
-            Trg republike 18, u sklopu Riblje pijace. Ovo je privremena stranica sa tokenima,
-            tipografijom i revizijom materijala.
-          </p>
-          <p class="status"><span aria-hidden="true">●</span> Primer statusa · zatvara se u 01:00</p>
-          <div class="ctas">
-            <a class="btn btn--primary" href={business.phone.whatsapp}>Rezerviši</a>
-            <a class="btn btn--ghost" href="#tipografija">Pogledaj meni</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section theme-dough" id="tipografija">
-      <div class="container">
-        <p class="eyebrow">Tipografija</p>
-        <h2>Paste po vojvođanski — čičak, ćuprija, đak, šuma, žito</h2>
-        <h3><em>Specijalitet kuće</em> · Ludi Sremac</h3>
-        <p class="body">
-          Fraunces 500–600 za naslove, Manrope (varijabilni) za tekst. Umereni rasponi:
-          H1 2,25rem na telefonu, najviše 3,25rem na desktopu. Č Ć Đ Š Ž — sve dijakritike
-          dolaze iz posebnog podskupa od ~2 KB.
-        </p>
-        <p class="price">1.280 RSD</p>
-      </div>
-    </section>
-
-    <section class="section theme-ink">
-      <div class="container">
-        <p class="eyebrow">Paleta i kontrast (WCAG)</p>
-        <ul class="swatches">
-          {
-            swatches.map((s) => (
-              <li style={`--sw:${s.hex}`}>
-                <span class="chip" />
-                <code>{s.token}</code>
-                <span class="hex">{s.hex}</span>
-                <span class="ratio">
-                  {s.ratio}:1 sa {s.on}
-                </span>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-    </section>
-
-    <section class="section theme-dough">
-      <div class="container">
-        <p class="eyebrow">Revizija fotografija — prikazane u izvornoj veličini, bez uvećavanja</p>
-        <ul class="audit">
-          {
-            gallery.map(({ name, img }) => (
-              <li>
-                <Image src={img} alt="" width={img.width} height={img.height} loading="lazy" />
-                <span>
-                  {name}
-                  <br />
-                  <strong>
-                    {img.width}×{img.height}
-                  </strong>
-                </span>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-    </section>
+    <Thread />
+    <Hero />
+    <About />
+    <Specialty />
+    <Menu />
+    <Gallery />
+    <Garden />
+    <Events />
+    <Reviews />
+    <Reservation />
+    <Delivery />
+    <Location />
   </main>
+  <Footer />
+  <ActionBar />
+  <!-- Shared SVG defs last: keeps the hero early in the byte stream. -->
+  <DoughDefs />
+  <MotifSprite />
 </BaseLayout>
 
-<style>
-  .hero__grid {
-    display: grid;
-    gap: var(--space-l);
-    align-items: center;
-  }
-  @media (min-width: 48rem) {
-    .hero__grid {
-      grid-template-columns: 0.9fr 1.1fr;
-    }
-  }
-  .logo {
-    color: var(--dough);
-    max-width: 22rem;
-  }
-  .logo :global([data-part='swoosh']) {
-    color: var(--tomato-on-ink);
-  }
-  .logo :global([data-part='emblem']) {
-    color: var(--basil-on-ink);
-  }
-  h1 {
-    margin-block: var(--space-2xs) var(--space-s);
-  }
-  .lead {
-    font-size: var(--fs-lead);
-    color: var(--fg-muted);
-    max-width: var(--text-max);
-  }
-  .status {
-    display: inline-flex;
-    gap: var(--space-2xs);
-    margin-top: var(--space-m);
-    padding: 0.35rem 0.85rem;
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-pill);
-    font-size: var(--fs-small);
-  }
-  .status span {
-    color: var(--basil-on-ink);
-  }
-  .ctas {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-xs);
-    margin-top: var(--space-m);
-  }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--tap-min);
-    padding: 0 1.25rem;
-    border-radius: var(--radius-pill);
-    font-weight: 600;
-    text-decoration: none;
-    transition: background-color var(--dur-fast) var(--ease-out);
-  }
-  .btn--primary {
-    background: var(--tomato);
-    color: var(--on-tomato);
-  }
-  .btn--primary:hover {
-    background: var(--tomato-text);
-  }
-  .btn--ghost {
-    border: 1px solid var(--rule);
-  }
-  .btn--ghost:hover {
-    border-color: var(--basil-on-ink);
-  }
-  h2 {
-    margin-block: var(--space-2xs) var(--space-s);
-  }
-  h3 em {
-    color: var(--accent-text);
-  }
-  .body {
-    margin-top: var(--space-s);
-    max-width: var(--text-max);
-  }
-  .price {
-    margin-top: var(--space-s);
-    font-family: var(--font-serif);
-    font-size: var(--fs-h3);
-    font-weight: 600;
-    font-variant-numeric: lining-nums tabular-nums;
-    color: var(--accent-text);
-  }
-  .swatches {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-    gap: var(--space-s);
-    margin: var(--space-s) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-  .swatches li {
-    display: grid;
-    gap: 0.15rem;
-    font-size: var(--fs-small);
-  }
-  .chip {
-    height: 4rem;
-    border-radius: var(--radius-m);
-    background: var(--sw);
-    box-shadow: inset 0 0 0 1px var(--rule);
-  }
-  .hex,
-  .ratio {
-    color: var(--fg-muted);
-  }
-  .audit {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-s);
-    margin: var(--space-s) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-  .audit li {
-    display: grid;
-    gap: var(--space-3xs);
-    font-size: var(--fs-micro);
-    color: var(--fg-muted);
-  }
-  .audit img {
-    border-radius: var(--radius-s);
-  }
-</style>
+<script>
+  import { initOpenStatus } from '../scripts/open-status';
+  initOpenStatus();
+</script>

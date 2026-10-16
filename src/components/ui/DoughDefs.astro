@@ -1,0 +1,57 @@
+---
+/**
+ * Shared SVG defs, referenced document-wide via url(#id) / href="#id":
+ *  - the traced logo geometry (#lp-*)
+ *  - dough texture patterns and the ribbon realism filter (irregular hand-cut
+ *    edges, flour-dusted surface light, soft shadow)
+ */
+import doughUrl from '../../assets/texture/dough.webp?url';
+import raw from '../../assets/brand/logo-parts.svg?raw';
+
+// Traced logo parts, defined once and referenced by <Logo> via <use href="#lp-…">.
+const logoParts = [...raw.matchAll(/data-part="(\w+)"[^>]*\sd="([^"]+)"/g)].map((m) => ({ id: m[1]!, d: m[2]! }));
+---
+
+<svg class="dough-defs" aria-hidden="true" focusable="false" width="0" height="0">
+  <defs>
+    {logoParts.map((p) => <path id={`lp-${p.id}`} fill-rule="evenodd" d={p.d} />)}
+    <!-- 256 CSS px tile of a 512 px texture = 2x density -->
+    <pattern id="dough" patternUnits="userSpaceOnUse" width="256" height="256">
+      <image href={doughUrl} width="256" height="256" preserveAspectRatio="none" />
+    </pattern>
+    <!-- Logo viewBox is 1804 units wide (~7.5 units per CSS px at hero size) -->
+    <pattern id="dough-logo" patternUnits="userSpaceOnUse" width="1100" height="1100">
+      <image href={doughUrl} width="1100" height="1100" preserveAspectRatio="none" />
+    </pattern>
+
+    <!-- Full realism: only used on the viewport-sized intro ribbon. -->
+    <filter id="dough-real" x="-5%" y="-10%" width="110%" height="125%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="16" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G" result="cut" />
+      <feGaussianBlur in="cut" stdDeviation="2.2" result="soft" />
+      <feSpecularLighting in="soft" surfaceScale="2.4" specularConstant="0.45" specularExponent="16" lighting-color="#fff6e2" result="spec">
+        <feDistantLight azimuth="235" elevation="52" />
+      </feSpecularLighting>
+      <feComposite in="spec" in2="cut" operator="in" result="specIn" />
+      <feComposite in="cut" in2="specIn" operator="arithmetic" k2="1" k3="0.55" result="lit" />
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="sb" />
+      <feOffset in="sb" dx="0" dy="7" result="so" />
+      <feComponentTransfer in="so" result="shadow"><feFuncA type="linear" slope="0.55" /></feComponentTransfer>
+      <feMerge><feMergeNode in="shadow" /><feMergeNode in="lit" /></feMerge>
+    </filter>
+
+    <!-- Lite version: shadow only (low-power devices) -->
+    <filter id="dough-lite" x="-5%" y="-10%" width="110%" height="125%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#000" flood-opacity="0.45" />
+    </filter>
+  </defs>
+</svg>
+
+<style>
+  .dough-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+</style>

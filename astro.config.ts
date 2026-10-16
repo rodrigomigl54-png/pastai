@@ -11,8 +11,8 @@ export default defineConfig({
   build: {
     // Hashed asset filenames live here -> long-term cacheable.
     assets: '_astro',
-    // Inline small stylesheets so critical CSS ships with the HTML.
-    inlineStylesheets: 'auto',
+    // CSS is ~10 KB gzipped: inline it all so nothing blocks the first render.
+    inlineStylesheets: 'always',
   },
   image: {
     // AVIF + WebP are produced per <Picture>; sharp is the default service.

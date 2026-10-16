@@ -1,7 +1,7 @@
 ---
 /**
- * Root document shell. SEO/OG/JSON-LD are completed in phase 6;
- * this sets the language, fonts, tokens and the preload policy.
+ * Root document shell: language, SEO/OG, fonts, tokens, preload policy and the
+ * tiny inline boot script that enables the intro overlay before first paint.
  */
 import '../styles/fonts.css';
 import '../styles/tokens.css';
@@ -13,9 +13,12 @@ interface Props {
   title: string;
   description: string;
   noindex?: boolean;
+  jsonLd?: object;
+  intro?: boolean;
 }
-const { title, description, noindex = false } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const { title, description, noindex = false, jsonLd, intro = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL('/og-image.jpg', Astro.site).href;
 ---
 
 <!doctype html>
@@ -28,8 +31,53 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#121110" />
+    <meta name="format-detection" content="telephone=no" />
+
+    {
+      intro && (
+        <script is:inline>
+          /* Boot: enable the intro overlay before first paint (plays on every visit).
+             Safety net: if the intro script never runs, the site is revealed after 8 s. */
+          (function () {
+            var h = document.documentElement;
+            h.classList.add('js', 'intro-on');
+            if (matchMedia('(prefers-reduced-motion: reduce)').matches) h.classList.add('rm');
+            if ((navigator.hardwareConcurrency || 8) <= 4 || h.classList.contains('rm')) h.classList.add('lite');
+            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            setTimeout(function () {
+              if (!window.__introDone) {
+                h.classList.remove('intro-on');
+                window.dispatchEvent(new Event('intro:done'));
+              }
+            }, 8000);
+          })();
+        </script>
+      )
+    }
+
     <link rel="preload" href={headingFont} as="font" type="font/woff2" crossorigin />
     <slot name="head" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pastai Bar & Restaurant" />
+    <meta property="og:locale" content="sr_RS" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Pastai logo, traka svežeg testa i tanjir crne paste sa dagnjama" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
   <body>
     <a class="skip-link" href="#sadrzaj">Preskoči na sadržaj</a>

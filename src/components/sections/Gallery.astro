@@ -1,0 +1,268 @@
+---
+import { getImage } from 'astro:assets';
+import Photo from '../ui/Photo.astro';
+import Icon from '../ui/Icon.astro';
+import { gallery } from '../../data/gallery';
+import { getPhoto } from '../../lib/photos';
+
+// Larger renditions for the lightbox (loaded only when opened).
+const full = await Promise.all(
+  gallery.map(async (g) => {
+    const img = getPhoto(g.file);
+    const [avif, webp] = await Promise.all([
+      getImage({ src: img, format: 'avif', width: img.width, quality: 80 }),
+      getImage({ src: img, format: 'webp', width: img.width, quality: 82 }),
+    ]);
+    return { avif: avif.src, webp: webp.src, w: img.width, h: img.height, alt: g.alt };
+  }),
+);
+---
+
+<section class="section gallery theme-ink" id="galerija" aria-labelledby="galerija-title">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Galerija</p>
+      <h2 id="galerija-title">Iz naše kuhinje i sale</h2>
+    </div>
+    <ul class="gallery__grid">
+      {
+        gallery.map((g, i) => (
+          <li class="gallery__item">
+            <button class="gallery__btn" type="button" data-lightbox-open={i} aria-label={`Otvori fotografiju: ${g.alt}`}>
+              <Photo file={g.file} alt={g.alt} sizes="(min-width: 64rem) 22vw, (min-width: 40rem) 31vw, 46vw" class="gallery__img" maxWidth={700} />
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <dialog class="lightbox" aria-label="Galerija fotografija" data-lightbox>
+    <figure class="lightbox__stage" data-lb-stage>
+      <picture>
+        <source type="image/avif" data-lb-avif />
+        <source type="image/webp" data-lb-webp />
+        <img alt="" decoding="async" data-lb-img />
+      </picture>
+      <figcaption class="lightbox__caption"><span data-lb-count></span> <span data-lb-caption></span></figcaption>
+    </figure>
+    <button class="lightbox__btn lightbox__close" type="button" data-lb-close aria-label="Zatvori"><Icon name="close" /></button>
+    <button class="lightbox__btn lightbox__prev" type="button" data-lb-prev aria-label="Prethodna fotografija"><Icon name="left" /></button>
+    <button class="lightbox__btn lightbox__next" type="button" data-lb-next aria-label="Sledeća fotografija"><Icon name="right" /></button>
+  </dialog>
+  <script type="application/json" data-lightbox-data set:html={JSON.stringify(full)} />
+</section>
+
+<style>
+  .gallery__grid {
+    columns: 2;
+    column-gap: var(--space-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .gallery__item {
+    break-inside: avoid;
+    margin-bottom: var(--space-xs);
+  }
+  .gallery__btn {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-m);
+    overflow: hidden;
+    background: var(--ink-raised);
+  }
+  .gallery__btn :global(.gallery__img) {
+    width: 100%;
+    height: auto;
+    transition: transform 600ms var(--ease-out), filter 600ms var(--ease-out);
+  }
+  .gallery__btn:hover :global(.gallery__img) {
+    transform: scale(1.04);
+  }
+  @media (min-width: 40rem) {
+    .gallery__grid {
+      columns: 3;
+    }
+  }
+  @media (min-width: 64rem) {
+    .gallery__grid {
+      columns: 4;
+      column-gap: var(--space-s);
+    }
+    .gallery__item {
+      margin-bottom: var(--space-s);
+    }
+  }
+
+  .lightbox {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgb(12 11 10 / 0.96);
+    color: var(--dough);
+    overscroll-behavior: contain;
+  }
+  .lightbox::backdrop {
+    background: rgb(0 0 0 / 0.6);
+  }
+  .lightbox[open] {
+    display: grid;
+    place-items: center;
+    animation: lb-in 260ms var(--ease-out);
+  }
+  @keyframes lb-in {
+    from { opacity: 0; }
+  }
+  .lightbox__stage {
+    display: grid;
+    gap: var(--space-xs);
+    justify-items: center;
+    margin: 0;
+    padding: 4rem var(--space-s) 5rem;
+    touch-action: pan-y;
+    transition: transform 260ms var(--ease-out), opacity 260ms var(--ease-out);
+  }
+  .lightbox__stage img {
+    max-width: min(100%, 60rem);
+    max-height: calc(100dvh - 10rem);
+    width: auto;
+    height: auto;
+    border-radius: var(--radius-m);
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .lightbox__caption {
+    max-width: 40rem;
+    text-align: center;
+    font-size: var(--fs-small);
+    color: var(--dough-muted);
+  }
+  .lightbox__btn {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgb(242 232 213 / 0.2);
+    border-radius: 50%;
+    background: rgb(18 17 16 / 0.6);
+    color: var(--dough);
+  }
+  .lightbox__close {
+    top: max(1rem, env(safe-area-inset-top));
+    right: 1rem;
+  }
+  .lightbox__prev,
+  .lightbox__next {
+    bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+  .lightbox__prev {
+    left: calc(50% - 56px);
+  }
+  .lightbox__next {
+    left: calc(50% + 8px);
+  }
+  @media (min-width: 48rem) {
+    .lightbox__prev,
+    .lightbox__next {
+      top: 50%;
+      bottom: auto;
+      transform: translateY(-50%);
+    }
+    .lightbox__prev {
+      left: 1.5rem;
+    }
+    .lightbox__next {
+      left: auto;
+      right: 1.5rem;
+    }
+  }
+</style>
+
+<script>
+  type Item = { avif: string; webp: string; w: number; h: number; alt: string };
+  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]')!;
+  const items: Item[] = JSON.parse(document.querySelector('[data-lightbox-data]')!.textContent!);
+  const img = dialog.querySelector<HTMLImageElement>('[data-lb-img]')!;
+  const avif = dialog.querySelector<HTMLSourceElement>('[data-lb-avif]')!;
+  const webp = dialog.querySelector<HTMLSourceElement>('[data-lb-webp]')!;
+  const caption = dialog.querySelector<HTMLElement>('[data-lb-caption]')!;
+  const count = dialog.querySelector<HTMLElement>('[data-lb-count]')!;
+  const stage = dialog.querySelector<HTMLElement>('[data-lb-stage]')!;
+  let index = 0;
+  let opener: HTMLElement | null = null;
+
+  const show = (i: number) => {
+    index = (i + items.length) % items.length;
+    const it = items[index]!;
+    avif.srcset = it.avif;
+    webp.srcset = it.webp;
+    img.src = it.webp;
+    img.width = it.w;
+    img.height = it.h;
+    img.alt = it.alt;
+    caption.textContent = it.alt;
+    count.textContent = `${index + 1} / ${items.length} ·`;
+    // Warm the neighbour so swiping feels instant.
+    const n = items[(index + 1) % items.length]!;
+    new Image().src = n.webp;
+  };
+
+  document.querySelectorAll<HTMLButtonElement>('[data-lightbox-open]').forEach((b) =>
+    b.addEventListener('click', () => {
+      opener = b;
+      show(Number(b.dataset.lightboxOpen));
+      dialog.showModal();
+      document.documentElement.classList.add('lightbox-open');
+    }),
+  );
+  dialog.addEventListener('close', () => {
+    document.documentElement.classList.remove('lightbox-open');
+    opener?.focus();
+  });
+  dialog.querySelector('[data-lb-close]')!.addEventListener('click', () => dialog.close());
+  dialog.querySelector('[data-lb-prev]')!.addEventListener('click', () => show(index - 1));
+  dialog.querySelector('[data-lb-next]')!.addEventListener('click', () => show(index + 1));
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') show(index + 1);
+    if (e.key === 'ArrowLeft') show(index - 1);
+  });
+  // Click on the dark backdrop area closes.
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog || e.target === stage) dialog.close();
+  });
+
+  // Swipe
+  let x0 = 0;
+  let y0 = 0;
+  let tracking = false;
+  stage.addEventListener('pointerdown', (e) => {
+    tracking = true;
+    x0 = e.clientX;
+    y0 = e.clientY;
+  });
+  stage.addEventListener('pointermove', (e) => {
+    if (!tracking) return;
+    const dx = e.clientX - x0;
+    if (Math.abs(dx) > Math.abs(e.clientY - y0)) stage.style.transform = `translateX(${dx * 0.6}px)`;
+  });
+  const end = (e: PointerEvent) => {
+    if (!tracking) return;
+    tracking = false;
+    const dx = e.clientX - x0;
+    stage.style.transform = '';
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(e.clientY - y0)) show(index + (dx < 0 ? 1 : -1));
+  };
+  stage.addEventListener('pointerup', end);
+  stage.addEventListener('pointercancel', () => {
+    tracking = false;
+    stage.style.transform = '';
+  });
+</script>

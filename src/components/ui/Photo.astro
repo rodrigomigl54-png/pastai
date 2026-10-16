@@ -1,0 +1,37 @@
+---
+/**
+ * <picture> with AVIF + WebP, responsive widths (capped at the source),
+ * intrinsic width/height (no CLS) and an optional blurred LQIP background.
+ */
+import { Picture } from 'astro:assets';
+import { getPhoto, lqip, widthsFor } from '../../lib/photos';
+
+interface Props {
+  file: string;
+  alt: string;
+  sizes: string;
+  priority?: boolean;
+  placeholder?: boolean;
+  class?: string;
+  maxWidth?: number;
+  quality?: number;
+}
+const { file, alt, sizes, priority = false, placeholder = !priority, class: cls, maxWidth, quality = 78 } = Astro.props;
+const img = getPhoto(file);
+const bg = placeholder ? await lqip(file) : undefined;
+---
+
+<Picture
+  src={img}
+  alt={alt}
+  formats={['avif', 'webp']}
+  fallbackFormat="jpg"
+  widths={widthsFor(img, maxWidth)}
+  sizes={sizes}
+  quality={quality}
+  loading={priority ? 'eager' : 'lazy'}
+  decoding={priority ? 'sync' : 'async'}
+  fetchpriority={priority ? 'high' : 'auto'}
+  class={cls}
+  style={bg ? `background-image:url(${bg});background-size:cover` : undefined}
+/>

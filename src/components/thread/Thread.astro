@@ -1,0 +1,75 @@
+---
+/**
+ * The scroll thread: one continuous ribbon of dough drawn with the real-dough
+ * texture, running from the hero logo's swoosh through every section. It sits
+ * behind content but above section backgrounds, draws itself with scroll and
+ * makes a small gesture (loop / twist / fold) at each section joint.
+ * Purely decorative: aria-hidden, pointer-events: none.
+ */
+---
+
+<svg class="thread" data-thread aria-hidden="true" focusable="false">
+  <g class="thread__flour" data-flour></g>
+  <path class="thread__shadow" data-tp></path>
+  <path class="thread__edge" data-tp></path>
+  <path class="thread__body" data-tp stroke="url(#dough)"></path>
+  <path class="thread__hi" data-tp></path>
+</svg>
+
+<style>
+  .thread {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: var(--z-thread);
+    width: 100%;
+    height: 0;
+    overflow: visible;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 600ms var(--ease-out);
+  }
+  .thread.is-ready {
+    opacity: 1;
+  }
+  .thread path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .thread__shadow {
+    stroke: rgb(40 26 8 / 0.32);
+    stroke-width: calc(var(--tw) + 1px);
+    transform: translate(1.5px, 3.5px);
+  }
+  .thread__edge {
+    stroke: #b8955a;
+    stroke-width: calc(var(--tw) + 1.6px);
+  }
+  .thread__body {
+    stroke-width: var(--tw);
+  }
+  .thread__hi {
+    stroke: rgb(255 250 236 / 0.6);
+    stroke-width: 1px;
+    transform: translate(-0.5px, -1.6px);
+  }
+  /* circles are injected by JS, so the rule must be global */
+  .thread__flour :global(circle) {
+    fill: #f6ecd6;
+    opacity: 0.35;
+  }
+  .thread {
+    --tw: 7px;
+  }
+  @media (min-width: 60rem) {
+    .thread {
+      --tw: 11px;
+    }
+  }
+</style>
+
+<script>
+  import { initThread } from './thread';
+  initThread();
+</script>

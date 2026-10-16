@@ -159,3 +159,114 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- Buttons ---------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--tap-min);
+  padding: 0 1.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-weight: 650;
+  font-size: 0.95rem;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn--primary {
+  background: var(--tomato);
+  color: var(--on-tomato);
+}
+.btn--primary:hover {
+  background: #a92f1b;
+}
+.btn--ghost {
+  border-color: var(--rule);
+  color: var(--fg);
+  background: transparent;
+}
+.btn--ghost:hover {
+  border-color: var(--accent-2-text);
+}
+.btn--basil {
+  background: var(--basil);
+  color: var(--dough);
+}
+.btn--basil:hover {
+  background: var(--basil-text);
+}
+
+/* ---- Section heading block -------------------------------------------- */
+.section-head {
+  display: grid;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-l);
+  max-width: var(--text-max);
+}
+.section-head p:not(.eyebrow) {
+  color: var(--fg-muted);
+}
+
+/* ---- Live open/closed pill -------------------------------------------- */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2rem;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-small);
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+}
+.status-pill[data-state='pending'] {
+  visibility: hidden;
+}
+.status-pill__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--accent-2-text);
+  box-shadow: 0 0 0 0 currentColor;
+}
+.status-pill[data-state='open'] .status-pill__dot {
+  animation: pulse 2.4s var(--ease-out) infinite;
+}
+.status-pill[data-state='closed'] .status-pill__dot {
+  background: var(--accent-text);
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgb(127 168 119 / 0.55); }
+  70%, 100% { box-shadow: 0 0 0 0.5rem rgb(127 168 119 / 0); }
+}
+
+/* Content stays above the scroll thread layer. */
+main > section > *,
+main > section {
+  position: relative;
+}
+main > section > * {
+  z-index: var(--z-content);
+}
+
+/* Scroll lock while an overlay owns the screen. */
+html.intro-on,
+html.menu-open,
+html.lightbox-open {
+  overflow: hidden;
+}
+html.intro-on body {
+  overflow: hidden;
+  touch-action: none;
+}

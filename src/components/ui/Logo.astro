@@ -1,0 +1,56 @@
+---
+/**
+ * Inline Pastai logo. Geometry lives once in DoughDefs.astro (ids #lp-*); every
+ * instance is a set of <use> references, so the page carries the traced paths
+ * only once. Each part stays individually animatable (data-part on the <use>).
+ *  - variant "full": emblem + wordmark + swoosh + 2016 + HAND MADE
+ *  - variant "compact": wordmark + swoosh (header/footer)
+ * The swoosh is filled with the dough texture (pattern #dough-logo).
+ */
+interface Props {
+  variant?: 'full' | 'compact';
+  class?: string;
+  id?: string;
+  textured?: boolean;
+  label?: string;
+}
+const { variant = 'full', class: cls, id, textured = true, label = 'Pastai' } = Astro.props;
+const viewBox = variant === 'full' ? '0 0 1804 1772' : '0 380 1804 860';
+---
+
+<svg
+  class:list={['logo', `logo--${variant}`, cls]}
+  id={id}
+  viewBox={viewBox}
+  role="img"
+  aria-label={label}
+  fill="currentColor"
+  data-logo
+>
+  {variant === 'full' && <use class="logo__emblem" data-part="emblem" href="#lp-emblem" />}
+  <use class="logo__wordmark" data-part="wordmark" href="#lp-wordmark" />
+  {textured && <use class="logo__swoosh-shadow" href="#lp-swoosh" transform="translate(10 22)" />}
+  <use class="logo__swoosh" data-part="swoosh" href="#lp-swoosh" fill={textured ? 'url(#dough-logo)' : undefined} />
+  {
+    variant === 'full' && (
+      <>
+        <use class="logo__year" data-part="year" href="#lp-year" />
+        <use class="logo__handmade" data-part="handmade" href="#lp-handmade" />
+      </>
+    )
+  }
+</svg>
+<style>
+  .logo {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .logo__swoosh-shadow {
+    fill: rgb(0 0 0 / 0.35);
+  }
+  :global(.theme-dough) .logo__swoosh-shadow {
+    fill: rgb(18 17 16 / 0.18);
+  }
+</style>

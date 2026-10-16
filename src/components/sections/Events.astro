@@ -1,0 +1,80 @@
+---
+/** Hidden entirely while src/data/events.ts is empty. */
+import Photo from '../ui/Photo.astro';
+import { events } from '../../data/events';
+import { WEEKDAYS_SR, formatDateSR } from '../../lib/format';
+import { weekdayOfISO } from '../../lib/hours';
+
+const list = events.filter((e) => e.title || e.date || e.description);
+---
+
+{
+  list.length > 0 && (
+    <section class="section events theme-dough" id="dogadjaji" aria-labelledby="dogadjaji-title">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Večeri i događaji</p>
+          <h2 id="dogadjaji-title">Šta se dešava u Pastai</h2>
+        </div>
+        <ul class="events__list">
+          {list.map((ev) => (
+            <li class="event">
+              {ev.image && <Photo file={ev.image} alt={ev.title ?? 'Događaj u restoranu Pastai'} sizes="(min-width: 60rem) 22rem, 90vw" class="event__img" />}
+              <div class="event__body">
+                {ev.date && (
+                  <p class="event__date">
+                    <time datetime={ev.time ? `${ev.date}T${ev.time}` : ev.date}>
+                      {WEEKDAYS_SR[weekdayOfISO(ev.date)]}, {formatDateSR(ev.date)}
+                      {ev.time && ` · ${ev.time}`}
+                    </time>
+                  </p>
+                )}
+                {ev.title && <h3>{ev.title}</h3>}
+                {ev.description && <p class="event__desc">{ev.description}</p>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  /* Sits between Bašta (dough) and Recenzije (ink): a deeper cream keeps sections distinct. */
+  .events {
+    background-color: var(--dough-deep);
+    --panel: var(--dough);
+  }
+  .events__list {
+    display: grid;
+    gap: var(--space-s);
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .event {
+    overflow: hidden;
+    border-radius: var(--radius-l);
+    background: var(--panel);
+  }
+  .event :global(.event__img) {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+  .event__body {
+    display: grid;
+    gap: var(--space-2xs);
+    padding: var(--space-m);
+  }
+  .event__date {
+    font-size: var(--fs-small);
+    font-weight: 700;
+    color: var(--accent-text);
+  }
+  .event__desc {
+    color: var(--fg-muted);
+  }
+</style>

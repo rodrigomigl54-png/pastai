@@ -1,0 +1,321 @@
+---
+import './menu.css';
+import MenuCard from './MenuCard.astro';
+import Icon from '../ui/Icon.astro';
+import { categories, menuByCategory } from '../../data/menu';
+import doughUrl from '../../assets/texture/dough.webp?url';
+
+const panels = categories
+  .map((c) => ({ ...c, items: menuByCategory(c.id) }))
+  .filter((c) => c.items.length > 0);
+const first = panels[0]!.id;
+---
+
+<section class="section menu theme-dough" id="meni" aria-labelledby="meni-title" style={`--dough-tex:url(${doughUrl})`} data-menu>
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Meni</p>
+      <h2 id="meni-title">Domaća pasta, sendviči i salate</h2>
+      <p>Prevucite kartice, izaberite kategoriju ili potražite jelo. Cene su u dinarima, prema ponudi na Wolt-u.</p>
+    </div>
+  </div>
+
+  <div class="menu__bar" data-menu-bar>
+    <div class="menu__chips" role="tablist" aria-label="Kategorije menija">
+      {
+        panels.map((p) => (
+          <button
+            class="chip"
+            type="button"
+            role="tab"
+            id={`tab-${p.id}`}
+            aria-controls={`panel-${p.id}`}
+            aria-selected={p.id === first ? 'true' : 'false'}
+            tabindex={p.id === first ? 0 : -1}
+            data-tab={p.id}
+          >
+            {p.label}
+            <span class="chip__count">{p.items.length}</span>
+          </button>
+        ))
+      }
+    </div>
+    <label class="menu__search">
+      <Icon name="search" size={18} />
+      <span class="visually-hidden">Pretraga jela</span>
+      <input type="search" placeholder="Pretraga" autocomplete="off" enterkeyhint="search" data-menu-search />
+    </label>
+  </div>
+
+  <div class="menu__panels">
+    {
+      panels.map((p) => (
+        <div
+          class="menu__panel"
+          role="tabpanel"
+          id={`panel-${p.id}`}
+          aria-labelledby={`tab-${p.id}`}
+          data-panel={p.id}
+          hidden={p.id !== first}
+        >
+          <h3 class="menu__panel-title">{p.label}</h3>
+          <div class="menu__track" tabindex="0" aria-label={`${p.label}: prevucite za još jela`} data-track>
+            {p.items.map((item, i) => (
+              <MenuCard item={item} index={i} />
+            ))}
+          </div>
+          <div class="menu__controls">
+            <svg class="strand" viewBox="0 0 240 12" preserveAspectRatio="none" aria-hidden="true">
+              <path class="strand__bg" d="M0 6c10-6 20-6 30 0s20 6 30 0 20-6 30 0 20 6 30 0 20-6 30 0 20 6 30 0 20-6 30 0 20 6 30 0" pathLength="1" />
+              <path class="strand__fg" d="M0 6c10-6 20-6 30 0s20 6 30 0 20-6 30 0 20 6 30 0 20-6 30 0 20 6 30 0 20-6 30 0 20 6 30 0" pathLength="1" data-strand />
+            </svg>
+            <span class="menu__count" aria-live="polite" data-count>1 / {p.items.length}</span>
+            <div class="menu__arrows">
+              <button type="button" class="arrow" data-prev aria-label="Prethodno jelo"><Icon name="left" /></button>
+              <button type="button" class="arrow" data-next aria-label="Sledeće jelo"><Icon name="right" /></button>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+    <p class="menu__empty" data-menu-empty hidden>Nema jela koja odgovaraju pretrazi.</p>
+  </div>
+
+  <div class="container menu__foot">
+    <a class="btn btn--basil" href="#dostava">Poruči za dostavu</a>
+    <button class="menu__motion" type="button" data-motion-toggle hidden>Uključi efekat pokreta</button>
+  </div>
+</section>
+
+<style>
+  .menu {
+    overflow: hidden;
+  }
+  h2 {
+    margin-top: var(--space-3xs);
+  }
+  .menu__bar {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    padding: var(--space-2xs) 0;
+    background: color-mix(in srgb, var(--dough) 92%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  .menu__chips {
+    display: flex;
+    gap: var(--space-2xs);
+    padding-inline: var(--gutter);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .menu__chips::-webkit-scrollbar {
+    display: none;
+  }
+  .chip {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: var(--tap-min);
+    padding: 0 1rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    font-size: var(--fs-small);
+    font-weight: 650;
+    white-space: nowrap;
+    scroll-snap-align: start;
+    transition: background-color var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+  }
+  .chip:hover {
+    border-color: var(--basil);
+  }
+  .chip[aria-selected='true'] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--dough);
+  }
+  .chip__count {
+    font-size: var(--fs-micro);
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
+  }
+  .menu__search {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    margin-inline: var(--gutter);
+    padding: 0 0.9rem;
+    min-height: var(--tap-min);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-pill);
+    background: var(--dough);
+    color: var(--ink-muted);
+  }
+  .menu__search:focus-within {
+    box-shadow: var(--focus-ring);
+  }
+  .menu__search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    font-size: 1rem; /* 16px: no iOS zoom */
+    color: var(--ink);
+    outline: none;
+  }
+  .menu__panels {
+    margin-top: var(--space-m);
+  }
+  .menu__panel-title {
+    display: none;
+    padding-inline: var(--gutter);
+    margin-bottom: var(--space-xs);
+  }
+  :global([data-searching]) .menu__panel-title {
+    display: block;
+  }
+  :global([data-searching]) .menu__panel + .menu__panel {
+    margin-top: var(--space-l);
+  }
+  .menu__track {
+    display: flex;
+    gap: var(--space-s);
+    padding: var(--space-2xs) var(--gutter) var(--space-m);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+    cursor: grab;
+  }
+  .menu__track::-webkit-scrollbar {
+    display: none;
+  }
+  .menu__track.is-dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+  }
+  .menu__track:focus-visible {
+    box-shadow: inset var(--focus-ring);
+    border-radius: var(--radius-m);
+  }
+  .menu__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+    padding-inline: var(--gutter);
+  }
+  .strand {
+    flex: 1;
+    height: 12px;
+    overflow: visible;
+  }
+  .strand path {
+    fill: none;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .strand__bg {
+    stroke: var(--dough-deep);
+    stroke-width: 3;
+  }
+  .strand__fg {
+    stroke: #d9b765;
+    stroke-width: 3.4;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0.85;
+    transition: stroke-dashoffset 200ms var(--ease-out);
+  }
+  .menu__count {
+    min-width: 3.5rem;
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+    color: var(--fg-muted);
+    text-align: right;
+  }
+  .menu__arrows {
+    display: none;
+    gap: var(--space-2xs);
+  }
+  .arrow {
+    display: grid;
+    place-items: center;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    background: transparent;
+  }
+  .arrow:hover {
+    border-color: var(--basil);
+  }
+  .arrow:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .menu__empty {
+    padding: var(--space-l) var(--gutter);
+    color: var(--fg-muted);
+  }
+  .menu__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-s);
+    margin-top: var(--space-l);
+  }
+  .menu__motion {
+    min-height: var(--tap-min);
+    border: 0;
+    background: none;
+    font-size: var(--fs-small);
+    text-decoration: underline;
+    color: var(--fg-muted);
+  }
+  :global([data-searching]) .menu__controls {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .menu__bar {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding-inline: var(--gutter);
+    }
+    .menu__chips {
+      padding-inline: 0;
+    }
+    .menu__search {
+      flex: 0 0 15rem;
+      margin-inline: 0;
+    }
+    .menu__arrows {
+      display: flex;
+    }
+  }
+  @media (min-width: 72rem) {
+    .menu__bar,
+    .menu__track,
+    .menu__controls,
+    .menu__panel-title {
+      padding-inline: max(var(--gutter), calc((100vw - var(--content-max)) / 2 + var(--gutter)));
+    }
+    .menu__track {
+      scroll-padding-inline: max(var(--gutter), calc((100vw - var(--content-max)) / 2 + var(--gutter)));
+    }
+  }
+</style>
+
+<script>
+  import { initMenu } from './menu-island';
+  import { whenNear } from '../../scripts/when-near';
+  whenNear('[data-menu]', initMenu);
+</script>

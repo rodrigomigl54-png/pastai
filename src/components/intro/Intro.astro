@@ -1,0 +1,144 @@
+---
+/**
+ * Intro overlay — "Nit testa".
+ * A ribbon of dough unrolls across the ink screen, carries restaurant photos
+ * inside it like a film strip, accelerates, curls and settles into the logo's
+ * swoosh; then logo + swoosh glide into their exact hero positions.
+ * The page renders underneath from the first byte; this is only an overlay
+ * (enabled by the inline script in BaseLayout, which sets html.intro-on).
+ */
+import { getImage } from 'astro:assets';
+import Logo from '../ui/Logo.astro';
+import { getPhoto } from '../../lib/photos';
+
+const FRAMES = ['enterijer-separe', 'crna-pasta-dagnje', 'rendanje-sira', 'zelene-taljatele-gnezda', 'taljatele-meso-pecurke'];
+const frames = await Promise.all(
+  FRAMES.map(async (f) => {
+    const img = getPhoto(f);
+    const out = await getImage({ src: img, format: 'webp', width: 480, quality: 62 });
+    return { src: out.src, ratio: img.width / img.height };
+  }),
+);
+---
+
+<div class="intro" data-intro role="region" aria-label="Uvodna animacija">
+  <svg class="intro__stage" data-stage aria-hidden="true" focusable="false">
+    <defs>
+      <mask id="intro-film-mask" maskUnits="userSpaceOnUse">
+        <path data-film-mask fill="none" stroke="#fff" stroke-linecap="round"></path>
+      </mask>
+    </defs>
+    <path class="intro__ribbon" data-ribbon fill="none" stroke="url(#dough)" stroke-linecap="round"></path>
+    <g mask="url(#intro-film-mask)">
+      <g class="intro__film" data-film>
+        {
+          /* width/height 0 until the script lays them out: an unsized SVG <image>
+             paints at its intrinsic size and would otherwise become the page's LCP.
+             data-href is swapped in once the hero image has loaded (no bandwidth race). */
+          frames.map((f, i) => (
+            <image data-href={f.src} width="0" height="0" data-frame={i} data-ratio={f.ratio} preserveAspectRatio="xMidYMid slice" />
+          ))
+        }
+      </g>
+    </g>
+  </svg>
+
+  <div class="intro__logo" data-intro-logo>
+    <Logo variant="full" label="Pastai" />
+  </div>
+
+  <button class="intro__skip" type="button" data-skip>Preskoči <span aria-hidden="true">→</span></button>
+</div>
+
+<style>
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-intro);
+    display: none;
+    background: var(--ink);
+    color: var(--dough);
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: none;
+  }
+  :global(html.intro-on) .intro {
+    display: block;
+  }
+  .intro__stage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .intro__ribbon {
+    stroke-dasharray: 1 1;
+  }
+  .intro__film {
+    opacity: 0;
+  }
+  .intro__film image {
+    opacity: 0.92;
+  }
+  /* Reduced motion: the "still image" is the real hero photo seen through a
+     translucent ink layer (no extra image that could become the LCP). */
+  :global(html.rm) .intro {
+    background: rgb(18 17 16 / 0.84);
+  }
+  :global(html.rm) .intro__stage {
+    display: none;
+  }
+  .intro__logo {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: min(62vw, 21rem);
+    transform: translate(-50%, -50%);
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+  .intro__logo :global([data-part='emblem']) {
+    color: var(--basil-on-ink);
+  }
+  .intro__logo :global([data-part]),
+  .intro__logo :global(.logo__swoosh-shadow) {
+    opacity: 0;
+  }
+  .intro__skip {
+    position: absolute;
+    left: 50%;
+    bottom: calc(1.25rem + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    min-height: var(--tap-min);
+    padding: 0 1.4rem;
+    border: 1px solid rgb(242 232 213 / 0.35);
+    border-radius: var(--radius-pill);
+    background: rgb(18 17 16 / 0.5);
+    color: var(--dough);
+    font-size: var(--fs-small);
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+  .intro__skip:hover {
+    border-color: var(--dough);
+  }
+  .intro__skip:focus-visible {
+    box-shadow: 0 0 0 3px var(--ink), 0 0 0 5px var(--basil-on-ink);
+  }
+  @media (min-width: 48rem) {
+    .intro__skip {
+      left: auto;
+      right: 2rem;
+      bottom: 2rem;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  import { runIntro } from './intro';
+  runIntro();
+</script>

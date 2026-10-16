@@ -1,0 +1,478 @@
+---
+import Icon from '../ui/Icon.astro';
+import { business } from '../../data/business';
+---
+
+<section class="section reservation theme-dough" id="rezervacija" aria-labelledby="rezervacija-title">
+  <div class="container reservation__grid">
+    <div class="reservation__intro">
+      <p class="eyebrow">Rezervacija</p>
+      <h2 id="rezervacija-title">Rezervišite sto preko WhatsApp-a</h2>
+      <p>
+        Popunite formular i poruka će se otvoriti u WhatsApp-u, spremna za slanje. Rezervacija važi kada je restoran
+        potvrdi.
+      </p>
+      <p class="reservation__call">
+        Radije biste pozvali? <a href={business.phone.tel}>{business.phone.display}</a>
+      </p>
+    </div>
+
+    <form class="rform" novalidate data-reservation>
+      <div class="field">
+        <label for="r-name">Ime <span aria-hidden="true">*</span></label>
+        <input id="r-name" name="name" type="text" autocomplete="name" required maxlength="60" aria-describedby="r-name-err" />
+        <p class="field__error" id="r-name-err" data-error="name"></p>
+      </div>
+
+      <fieldset class="field">
+        <legend>Broj osoba</legend>
+        <div class="stepper">
+          <button type="button" class="stepper__btn" data-step="-1" aria-label="Manje osoba"><Icon name="minus" size={18} /></button>
+          <input id="r-guests" name="guests" type="number" inputmode="numeric" min="1" max="20" value="2" aria-label="Broj osoba" aria-describedby="r-guests-hint" />
+          <button type="button" class="stepper__btn" data-step="1" aria-label="Više osoba"><Icon name="plus" size={18} /></button>
+        </div>
+        <p class="field__hint" id="r-guests-hint" data-guests-hint hidden>Za veće grupe preporučujemo poziv: <a href={business.phone.tel}>{business.phone.display}</a></p>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Datum</legend>
+        <div class="dates" role="radiogroup" aria-label="Izaberite datum" aria-describedby="r-date-err" data-dates></div>
+        <p class="field__error" id="r-date-err" data-error="date"></p>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Vreme</legend>
+        <div class="slots" role="radiogroup" aria-label="Izaberite vreme" aria-describedby="r-time-err" data-slots></div>
+        <p class="field__hint" data-slots-empty hidden>Za ovaj dan više nema slobodnih termina. Izaberite drugi datum.</p>
+        <p class="field__error" id="r-time-err" data-error="time"></p>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Mesto</legend>
+        <div class="segmented">
+          <label><input type="radio" name="seating" value="basta" /><span>Bašta</span></label>
+          <label><input type="radio" name="seating" value="unutra" /><span>Unutra</span></label>
+          <label><input type="radio" name="seating" value="svejedno" checked /><span>Svejedno</span></label>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label for="r-note">Napomena <span class="field__opt">(nije obavezno)</span></label>
+        <textarea id="r-note" name="note" rows="3" maxlength="300" placeholder="Proslava, alergije…"></textarea>
+      </div>
+
+      <button class="btn btn--primary rform__submit" type="submit"><Icon name="chat" size={18} /> Pošalji preko WhatsApp-a</button>
+
+      <div class="rform__done" role="status" tabindex="-1" data-done hidden>
+        <Icon name="check" size={22} />
+        <p>
+          <strong>Poruka je spremna u WhatsApp-u, samo pritisni Pošalji.</strong>
+          Rezervacija važi kada je restoran potvrdi.
+        </p>
+        <a class="rform__again" href="#" data-open-again>WhatsApp se nije otvorio? Otvori ponovo</a>
+      </div>
+    </form>
+  </div>
+</section>
+
+<style>
+  .reservation__grid {
+    display: grid;
+    gap: var(--space-l);
+  }
+  .reservation__intro {
+    display: grid;
+    gap: var(--space-xs);
+    align-content: start;
+  }
+  .reservation__intro p:not(.eyebrow) {
+    color: var(--fg-muted);
+  }
+  .reservation__call a {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .rform {
+    display: grid;
+    gap: var(--space-m);
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--dough-deep);
+    box-shadow: var(--shadow-dough);
+  }
+  .field {
+    display: grid;
+    gap: 0.4rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .field > label,
+  .field legend {
+    padding: 0;
+    margin-bottom: 0.4rem;
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .field__opt {
+    font-weight: 400;
+    color: var(--ink-muted);
+  }
+  input[type='text'],
+  textarea,
+  .stepper input {
+    width: 100%;
+    min-height: var(--tap-min);
+    padding: 0.6rem 0.85rem;
+    border: 1px solid rgb(18 17 16 / 0.25);
+    border-radius: var(--radius-m);
+    background: var(--dough);
+    font-size: 1rem;
+  }
+  textarea {
+    resize: vertical;
+  }
+  input:focus-visible,
+  textarea:focus-visible {
+    border-color: var(--basil);
+  }
+  [aria-invalid='true'] {
+    border-color: var(--tomato-text) !important;
+  }
+  .field__error {
+    min-height: 0;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--tomato-text);
+  }
+  .field__error:empty {
+    display: none;
+  }
+  .field__hint {
+    font-size: var(--fs-small);
+    color: var(--basil-text);
+  }
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    width: max-content;
+  }
+  .stepper input {
+    width: 4.5rem;
+    text-align: center;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .stepper input::-webkit-inner-spin-button,
+  .stepper input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+  }
+  .stepper__btn {
+    display: grid;
+    place-items: center;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    border: 1px solid rgb(18 17 16 / 0.25);
+    border-radius: 50%;
+    background: var(--dough);
+  }
+  .stepper__btn:disabled {
+    opacity: 0.4;
+  }
+
+  /* Date strip & time slots are generated by the script below. */
+  .dates,
+  .slots {
+    display: flex;
+    gap: var(--space-2xs);
+  }
+  .dates {
+    overflow-x: auto;
+    padding: 4px 4px 8px;
+    margin: -4px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+  .slots {
+    flex-wrap: wrap;
+  }
+  .dates :global(label),
+  .slots :global(label) {
+    position: relative;
+    flex: none;
+    scroll-snap-align: start;
+  }
+  .dates :global(input),
+  .slots :global(input),
+  .segmented input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .dates :global(span) {
+    display: grid;
+    justify-items: center;
+    gap: 0.1rem;
+    min-width: 4rem;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid rgb(18 17 16 / 0.2);
+    border-radius: var(--radius-m);
+    background: var(--dough);
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    text-transform: lowercase;
+    cursor: pointer;
+  }
+  .dates :global(b) {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    line-height: 1.1;
+    font-variant-numeric: lining-nums;
+  }
+  .slots :global(span) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-height: var(--tap-min);
+    padding: 0 0.8rem;
+    border: 1px solid rgb(18 17 16 / 0.2);
+    border-radius: var(--radius-pill);
+    background: var(--dough);
+    font-size: var(--fs-small);
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+  .slots :global(small) {
+    font-weight: 500;
+    color: var(--ink-muted);
+  }
+  .dates :global(input:checked + span),
+  .slots :global(input:checked + span),
+  .segmented input:checked + span {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--dough);
+  }
+  .slots :global(input:checked + span small) {
+    color: var(--dough-muted);
+  }
+  .dates :global(input:focus-visible + span),
+  .slots :global(input:focus-visible + span),
+  .segmented input:focus-visible + span {
+    box-shadow: var(--focus-ring);
+  }
+  .segmented {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--dough);
+    border: 1px solid rgb(18 17 16 / 0.15);
+  }
+  .segmented label {
+    position: relative;
+  }
+  .segmented span {
+    display: grid;
+    place-items: center;
+    min-height: calc(var(--tap-min) - 6px);
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-small);
+    font-weight: 650;
+    cursor: pointer;
+    transition: background-color var(--dur-fast), color var(--dur-fast);
+  }
+  .rform__submit {
+    width: 100%;
+    min-height: 3.2rem;
+    font-size: 1rem;
+  }
+  .rform__done {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-xs);
+    padding: var(--space-s);
+    border-radius: var(--radius-m);
+    background: var(--basil-soft);
+    color: var(--basil-text);
+  }
+  .rform__done[hidden] {
+    display: none;
+  }
+  .rform__done strong {
+    display: block;
+    color: var(--ink);
+  }
+  .rform__again {
+    grid-column: 2;
+    font-size: var(--fs-small);
+    color: var(--basil-text);
+  }
+  @media (min-width: 60rem) {
+    .reservation__grid {
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: var(--space-xl);
+    }
+    .reservation__intro {
+      position: sticky;
+      top: calc(var(--header-h) + var(--space-l));
+    }
+    .rform {
+      padding: var(--space-l);
+    }
+  }
+</style>
+
+<script>
+  import { addDaysISO, localParts, reservationSlots, todayISO, weekdayOfISO } from '../../lib/hours';
+  import { MONTHS_SR_SHORT, WEEKDAYS_SR_SHORT } from '../../lib/format';
+  import { buildReservationMessage, buildWhatsAppUrl, type Seating } from '../../lib/whatsapp';
+  import { whenNear } from '../../scripts/when-near';
+
+  // Built only when the form approaches the viewport (keeps the initial main thread free).
+  whenNear('[data-reservation]', () => {
+    const DAYS_AHEAD = 60;
+    const form = document.querySelector<HTMLFormElement>('[data-reservation]')!;
+    const datesEl = form.querySelector<HTMLElement>('[data-dates]')!;
+    const slotsEl = form.querySelector<HTMLElement>('[data-slots]')!;
+    const slotsEmpty = form.querySelector<HTMLElement>('[data-slots-empty]')!;
+    const guests = form.querySelector<HTMLInputElement>('#r-guests')!;
+    const guestsHint = form.querySelector<HTMLElement>('[data-guests-hint]')!;
+    const done = form.querySelector<HTMLElement>('[data-done]')!;
+    let lastUrl = '';
+
+    const el = (html: string) => {
+      const t = document.createElement('template');
+      t.innerHTML = html.trim();
+      return t.content.firstElementChild as HTMLElement;
+    };
+
+    // ---- Dates (min = today in Belgrade) ------------------------------------------
+    const renderDates = () => {
+      const today = todayISO();
+      datesEl.replaceChildren();
+      for (let i = 0; i < DAYS_AHEAD; i++) {
+        const iso = addDaysISO(today, i);
+        const [, m, d] = iso.split('-').map(Number);
+        const top = i === 0 ? 'danas' : i === 1 ? 'sutra' : WEEKDAYS_SR_SHORT[weekdayOfISO(iso)];
+        const label = el(
+          `<label><input type="radio" name="date" value="${iso}"${i === 0 ? ' checked' : ''}>` +
+            `<span>${top}<b>${d}</b>${MONTHS_SR_SHORT[m! - 1]}</span></label>`,
+        );
+        datesEl.append(label);
+      }
+    };
+
+    // ---- Time slots for the selected day -------------------------------------
+    const renderSlots = () => {
+      const date = (form.elements.namedItem('date') as RadioNodeList).value;
+      const previous = (form.elements.namedItem('time') as RadioNodeList | null)?.value;
+      const isToday = date === todayISO();
+      const slots = reservationSlots(weekdayOfISO(date), isToday ? { nowMinutes: localParts(new Date()).minutes } : {});
+      slotsEl.replaceChildren(
+        ...slots.map((s) =>
+          el(
+            `<label><input type="radio" name="time" value="${s.time}" data-next-day="${s.nextDay}"${s.time === previous ? ' checked' : ''}>` +
+              `<span>${s.time}${s.nextDay ? ' <small>posle ponoći</small>' : ''}</span></label>`,
+          ),
+        ),
+      );
+      slotsEmpty.hidden = slots.length > 0;
+    };
+
+    renderDates();
+    renderSlots();
+    datesEl.addEventListener('change', () => {
+      renderSlots();
+      clearError('date');
+    });
+    slotsEl.addEventListener('change', () => clearError('time'));
+
+    // ---- Guests stepper -------------------------------------------------------
+    const setGuests = (n: number) => {
+      const v = Math.max(1, Math.min(20, Math.round(n) || 1));
+      guests.value = String(v);
+      guestsHint.hidden = v < 10;
+      form.querySelector<HTMLButtonElement>('[data-step="-1"]')!.disabled = v <= 1;
+      form.querySelector<HTMLButtonElement>('[data-step="1"]')!.disabled = v >= 20;
+    };
+    form.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((b) =>
+      b.addEventListener('click', () => setGuests(Number(guests.value) + Number(b.dataset.step))),
+    );
+    guests.addEventListener('change', () => setGuests(Number(guests.value)));
+    setGuests(2);
+
+    // Links like "Rezerviši mesto u bašti" preselect the seating.
+    document.querySelectorAll<HTMLAnchorElement>('[data-seating]').forEach((a) =>
+      a.addEventListener('click', () => {
+        const r = form.querySelector<HTMLInputElement>(`input[name="seating"][value="${a.dataset.seating}"]`);
+        if (r) r.checked = true;
+      }),
+    );
+
+    // ---- Validation -----------------------------------------------------------
+    const setError = (key: string, msg: string) => {
+      form.querySelector<HTMLElement>(`[data-error="${key}"]`)!.textContent = msg;
+      if (key === 'name') form.querySelector('#r-name')!.setAttribute('aria-invalid', 'true');
+    };
+    const clearError = (key: string) => {
+      form.querySelector<HTMLElement>(`[data-error="${key}"]`)!.textContent = '';
+      if (key === 'name') form.querySelector('#r-name')!.removeAttribute('aria-invalid');
+    };
+    form.querySelector('#r-name')!.addEventListener('input', () => clearError('name'));
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const name = String(data.get('name') ?? '').trim();
+      const date = String(data.get('date') ?? '');
+      const time = String(data.get('time') ?? '');
+      let firstInvalid: HTMLElement | null = null;
+
+      if (name.length < 2) {
+        setError('name', 'Unesite ime (najmanje 2 slova).');
+        firstInvalid ??= form.querySelector('#r-name');
+      }
+      if (!date || date < todayISO()) {
+        setError('date', 'Izaberite datum.');
+        firstInvalid ??= datesEl;
+      }
+      if (!time) {
+        setError('time', 'Izaberite vreme dolaska.');
+        firstInvalid ??= slotsEl.querySelector('input') ?? slotsEl;
+      }
+      if (firstInvalid) {
+        firstInvalid.focus();
+        return;
+      }
+
+      const nextDay = form.querySelector<HTMLInputElement>('input[name="time"]:checked')!.dataset.nextDay === 'true';
+      const message = buildReservationMessage({
+        name,
+        guests: Number(guests.value),
+        date,
+        time,
+        nextDay,
+        seating: (data.get('seating') as Seating) ?? 'svejedno',
+        note: String(data.get('note') ?? ''),
+      });
+      lastUrl = buildWhatsAppUrl(message);
+      // (A 'noopener' feature string would make open() return null, so detach manually.)
+      const win = window.open(lastUrl, '_blank');
+      if (win) win.opener = null;
+      else location.href = lastUrl;
+      done.hidden = false;
+      done.focus();
+    });
+
+    form.querySelector('[data-open-again]')!.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (lastUrl) location.href = lastUrl;
+    });
+  });
+</script>

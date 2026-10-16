@@ -1,0 +1,48 @@
+---
+import Icon from '../ui/Icon.astro';
+import { business } from '../../data/business';
+---
+
+<section class="section delivery theme-ink" id="dostava" aria-labelledby="dostava-title">
+  <div class="container delivery__box">
+    <div>
+      <p class="eyebrow">Dostava i za poneti</p>
+      <h2 id="dostava-title">Dostava paste u Novom Sadu</h2>
+      <p class="delivery__lead">Poručite preko Wolt-a ili svratite po porudžbinu za poneti.</p>
+    </div>
+    <div class="delivery__actions">
+      <a class="btn btn--primary" href={business.links.wolt} target="_blank" rel="noopener">
+        <Icon name="bag" size={18} /> Poruči na Wolt-u
+        <span class="visually-hidden">(otvara se u novom prozoru)</span>
+      </a>
+      <a class="btn btn--ghost" href={business.phone.tel}><Icon name="phone" size={18} /> {business.phone.display}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .delivery__box {
+    display: grid;
+    gap: var(--space-m);
+    align-items: center;
+  }
+  h2 {
+    margin-block: var(--space-2xs) var(--space-xs);
+  }
+  .delivery__lead {
+    color: var(--fg-muted);
+  }
+  .delivery__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+  @media (min-width: 60rem) {
+    .delivery__box {
+      grid-template-columns: 1.4fr 1fr;
+    }
+    .delivery__actions {
+      justify-content: flex-end;
+    }
+  }
+</style>

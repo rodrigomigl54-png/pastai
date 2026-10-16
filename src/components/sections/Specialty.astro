@@ -1,0 +1,138 @@
+---
+import Photo from '../ui/Photo.astro';
+import DoughNest from '../ui/DoughNest.astro';
+import { menu } from '../../data/menu';
+import { specialtyPhoto } from '../../data/gallery';
+import { SHOW_PRICES } from '../../config/site';
+import { formatPrice } from '../../lib/format';
+
+const dish = menu.find((m) => m.id === 'ludi-sremac')!;
+---
+
+<section class="section specialty theme-ink" id="specijalitet" aria-labelledby="specijalitet-title">
+  <div class="container specialty__grid">
+    <div class="specialty__art">
+      {
+        specialtyPhoto ? (
+          <Photo file={specialtyPhoto} alt={`${dish.name}, specijalitet kuće`} sizes="(min-width: 60rem) 30rem, 80vw" class="specialty__photo" />
+        ) : (
+          <DoughNest class="specialty__nest" loops={6} seed={11} />
+        )
+      }
+      <span class="specialty__stamp" aria-hidden="true">Specijalitet<br />kuće</span>
+    </div>
+    <div class="specialty__text">
+      <p class="eyebrow">Specijalitet kuće</p>
+      <h2 id="specijalitet-title">„Ludi Sremac“</h2>
+      <ul class="specialty__tags" aria-label="Oznake">
+        <li>Popularno</li>
+        <li>Specijalitet</li>
+      </ul>
+      {dish.description && <p class="specialty__desc">{dish.description}</p>}
+      {
+        dish.ingredients && (
+          <p class="specialty__ingredients">{dish.ingredients.join(' · ')}</p>
+        )
+      }
+      {SHOW_PRICES && dish.price !== null && <p class="specialty__price">{formatPrice(dish.price)}</p>}
+      <div class="specialty__ctas">
+        <a class="btn btn--primary" href="#rezervacija">Rezerviši sto</a>
+        <a class="btn btn--ghost" href="#meni" data-menu-jump="paste">Ceo meni</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .specialty__grid {
+    display: grid;
+    gap: var(--space-l);
+    align-items: center;
+  }
+  .specialty__art {
+    position: relative;
+    width: min(78vw, 24rem);
+    margin-inline: auto;
+  }
+  .specialty__art :global(.specialty__photo) {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  .specialty__stamp {
+    position: absolute;
+    right: -0.25rem;
+    bottom: 0.75rem;
+    display: grid;
+    place-items: center;
+    width: 5.6rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--tomato);
+    color: var(--on-tomato);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    line-height: 1.1;
+    text-align: center;
+    transform: rotate(-12deg);
+    box-shadow: var(--shadow-dough);
+  }
+  .specialty__text {
+    text-align: center;
+  }
+  h2 {
+    margin-block: var(--space-2xs) var(--space-xs);
+    font-size: calc(var(--fs-h2) * 1.12);
+  }
+  .specialty__tags {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .specialty__tags li {
+    padding: 0.2rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+  .specialty__desc,
+  .specialty__ingredients {
+    margin-top: var(--space-s);
+    color: var(--fg-muted);
+  }
+  .specialty__price {
+    margin-top: var(--space-s);
+    font-family: var(--font-serif);
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .specialty__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-xs);
+    margin-top: var(--space-m);
+  }
+  @media (min-width: 60rem) {
+    .specialty__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .specialty__text {
+      text-align: left;
+    }
+    .specialty__tags,
+    .specialty__ctas {
+      justify-content: flex-start;
+    }
+  }
+</style>

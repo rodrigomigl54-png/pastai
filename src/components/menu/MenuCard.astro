@@ -1,0 +1,165 @@
+---
+/**
+ * One swipeable dish card with its own theme:
+ *  - gradient background (theme.from -> theme.to) + dough grain
+ *  - ingredient motifs at different depths (parallax on swipe/tilt)
+ *  - an animated aroma layer (CSS only, runs only while the card is visible)
+ * Flips to show description/ingredients when the owner has provided them.
+ */
+import { categories, type MenuItem } from '../../data/menu';
+import { SHOW_PRICES } from '../../config/site';
+import { formatPrice } from '../../lib/format';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  item: MenuItem;
+  index: number;
+}
+const { item, index } = Astro.props;
+const { theme } = item;
+
+// Pick a legible motif colour from the gradient's average luminance.
+const lum = (hex: string) => {
+  const n = parseInt(hex.slice(1), 16);
+  const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * c[0]! + 0.7152 * c[1]! + 0.0722 * c[2]!;
+};
+const avg = (lum(theme.from) + lum(theme.to)) / 2;
+const dark = avg < 0.28;
+
+// Motif placement slots: [x%, y%, size(rem), rotate(deg), depth]
+const SLOTS: [number, number, number, number, number][] = [
+  [50, 46, 5.2, -8, 1],
+  [14, 16, 2.6, 18, 0.45],
+  [84, 18, 2.2, -22, 0.7],
+  [86, 70, 2.8, 12, 0.55],
+  [12, 74, 2.3, -14, 0.8],
+  [64, 84, 1.7, 30, 0.35],
+  [34, 12, 1.6, -30, 0.3],
+];
+const motifs = theme.motifs ?? [];
+const placed = motifs.length
+  ? SLOTS.slice(0, Math.min(SLOTS.length, motifs.length === 1 ? 5 : 7)).map((slot, i) => ({
+      name: motifs[i % motifs.length]!,
+      slot,
+    }))
+  : [];
+
+const flippable = Boolean(item.description || item.ingredients?.length);
+// Diacritic-insensitive search key; đ has no NFD decomposition, so both
+// common spellings ("dj" and "d") are indexed.
+// The category label is indexed too ("vojvođanski" finds both nasuvo pastas).
+const label = categories.find((c) => c.id === item.category)?.label ?? '';
+const plain = `${item.name} ${label}`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const searchKey = `${plain.replace(/đ/g, 'dj')} ${plain.replace(/đ/g, 'd')}`;
+const titleId = `dish-${item.id}`;
+---
+
+<article
+  class:list={['mcard', `mcard--${item.category}`, dark ? 'mcard--dark' : 'mcard--light', flippable && 'mcard--flippable']}
+  style={`--from:${theme.from};--to:${theme.to};--i:${index}`}
+  data-card
+  data-search={searchKey}
+  data-aroma={theme.aroma ?? 'none'}
+  aria-labelledby={titleId}
+>
+  <div class="mcard__inner">
+    <div class="mcard__face mcard__front">
+      <div class="mcard__art" aria-hidden="true">
+        <div class="mcard__pattern"></div>
+        <div class="mcard__grain"></div>
+        {
+          theme.aroma && (
+            <div class={`aroma aroma--${theme.aroma}`}>
+              {Array.from({ length: 7 }, (_, i) => (
+                <span style={`--n:${i}`} />
+              ))}
+            </div>
+          )
+        }
+        {
+          placed.length ? (
+            <div class="mcard__motifs">
+              {placed.map(({ name, slot: [x, y, s, r, depth] }) => (
+                <svg
+                  class="motif"
+                  viewBox="0 0 48 48"
+                  style={`--x:${x}%;--y:${y}%;--s:${s}rem;--r:${r}deg;--d:${depth}`}
+                >
+                  <use href={`#m-${name}`} />
+                </svg>
+              ))}
+            </div>
+          ) : (
+            <svg class="mcard__abstract" viewBox="0 0 200 120" style="--d:1">
+              <path
+                d="M10 86C40 30 70 30 92 64s54 40 70 6c10-22 30-26 38-10"
+                fill="none"
+                stroke="url(#dough)"
+                stroke-width="11"
+                stroke-linecap="round"
+              />
+              <path
+                d="M10 86C40 30 70 30 92 64s54 40 70 6c10-22 30-26 38-10"
+                fill="none"
+                stroke="rgb(255 250 235 / .5)"
+                stroke-width="1.2"
+                stroke-linecap="round"
+                transform="translate(-1 -3.6)"
+              />
+            </svg>
+          )
+        }
+      </div>
+
+      <div class="mcard__label">
+        {
+          item.tags.length > 0 && (
+            <ul class="mcard__tags" aria-label="Oznake">
+              {item.tags.includes('specijalitet') && <li class="tag tag--special">Specijalitet</li>}
+              {item.tags.includes('popularno') && <li class="tag tag--popular">Popularno</li>}
+              {item.tags.includes('vege') && (
+                <li class="tag tag--vege">
+                  <Icon name="leaf" size={13} /> Vege
+                </li>
+              )}
+            </ul>
+          )
+        }
+        <h3 class="mcard__name" id={titleId}>{item.name}</h3>
+        <div class="mcard__row">
+          {SHOW_PRICES && item.price !== null && <p class="mcard__price">{formatPrice(item.price)}</p>}
+          {
+            flippable && (
+              <button class="mcard__flip" type="button" aria-expanded="false" data-flip>
+                Sastojci
+              </button>
+            )
+          }
+        </div>
+      </div>
+    </div>
+
+    {
+      flippable && (
+        <div class="mcard__face mcard__back">
+          <h4>{item.name}</h4>
+          {item.description && <p>{item.description}</p>}
+          {item.ingredients && (
+            <ul>
+              {item.ingredients.map((ing) => (
+                <li>{ing}</li>
+              ))}
+            </ul>
+          )}
+          <button class="mcard__flip" type="button" data-flip>
+            Nazad
+          </button>
+        </div>
+      )
+    }
+  </div>
+</article>

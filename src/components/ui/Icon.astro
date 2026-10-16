@@ -1,0 +1,54 @@
+---
+/** Minimal 24px stroke icon set (inline, no requests). Decorative by default. */
+const PATHS = {
+  phone: 'M5 4h3.5l1.8 4.5-2.3 1.4a11 11 0 0 0 6.1 6.1l1.4-2.3L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16 16 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4Z',
+  chat: 'M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4A8 8 0 1 1 20 11.5ZM9 11.5h.01M12.5 11.5h.01M16 11.5h.01',
+  plate: 'M12 19a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm0-3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM2.5 4v5a1.5 1.5 0 0 0 3 0V4M4 9v11M21 4c-1.6 1-2 3-2 6h2v10',
+  instagram: 'M7.5 3h9A4.5 4.5 0 0 1 21 7.5v9a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-9A4.5 4.5 0 0 1 7.5 3Zm4.5 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm5.2-9.2h.01',
+  facebook: 'M14 21v-7.5h2.6l.4-3H14V8.6c0-.9.3-1.6 1.6-1.6H17V4.3a20 20 0 0 0-2.3-.1C12.4 4.2 11 5.6 11 8.1v2.4H8.5v3H11V21',
+  pin: 'M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Zm0-8.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
+  clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-13.5V12l3 2',
+  star: 'm12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9Z',
+  leaf: 'M5 19C4 10 10 4 20 4c0 10-6 16-15 15Zm0 0 9-9',
+  search: 'M10.5 18a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15ZM16 16l5 5',
+  close: 'M6 6l12 12M18 6 6 18',
+  left: 'M15 5l-7 7 7 7',
+  right: 'M9 5l7 7-7 7',
+  menu: 'M4 7h16M4 12h16M4 17h10',
+  bag: 'M5.5 8h13l-1 12h-11Zm3.5 0V6.5a3 3 0 0 1 6 0V8',
+  plus: 'M12 5v14M5 12h14',
+  minus: 'M5 12h14',
+  calendar: 'M4.5 6h15v14h-15ZM4.5 10h15M8.5 3.5v4M15.5 3.5v4',
+  check: 'm5 12.5 4.5 4.5L19 7.5',
+  external: 'M14 4h6v6M20 4l-9 9M18 14v5H5V6h5',
+  users: 'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM2.5 20a6.5 6.5 0 0 1 13 0M16 4.3a3.5 3.5 0 0 1 0 6.4M18 14a6.5 6.5 0 0 1 3.5 6',
+  sun: 'M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-13v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4',
+} as const;
+
+export type IconName = keyof typeof PATHS;
+interface Props {
+  name: IconName;
+  size?: number;
+  class?: string;
+  label?: string;
+}
+const { name, size = 22, class: cls, label } = Astro.props;
+---
+
+<svg
+  class:list={['icon', cls]}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.7"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden={label ? undefined : 'true'}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  focusable="false"
+>
+  <path d={PATHS[name]} />
+</svg>

@@ -1,0 +1,253 @@
+---
+import Logo from '../ui/Logo.astro';
+import Icon from '../ui/Icon.astro';
+import { business } from '../../data/business';
+
+const links = [
+  { href: '#meni', label: 'Meni' },
+  { href: '#o-nama', label: 'O nama' },
+  { href: '#galerija', label: 'Galerija' },
+  { href: '#recenzije', label: 'Recenzije' },
+  { href: '#dostava', label: 'Dostava' },
+  { href: '#lokacija', label: 'Lokacija' },
+];
+---
+
+<header class="site-header theme-ink" data-header>
+  <div class="site-header__bar container">
+    <a class="site-header__logo" href="#top" aria-label="Pastai, na vrh stranice">
+      <Logo variant="compact" textured={false} label="Pastai" />
+    </a>
+    <nav class="site-header__nav" aria-label="Glavna navigacija">
+      <ul>
+        {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <a class="btn btn--primary site-header__cta" href="#rezervacija">Rezerviši</a>
+    <button class="site-header__toggle" type="button" aria-expanded="false" aria-controls="mobilni-meni" data-menu-toggle>
+      <span class="visually-hidden" data-menu-label>Otvori meni</span>
+      <span class="burger" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu theme-ink" id="mobilni-meni" data-mobile-menu hidden>
+    <nav aria-label="Mobilna navigacija">
+      <ul>
+        {links.map((l, i) => <li style={`--i:${i}`}><a href={l.href} data-menu-link>{l.label}</a></li>)}
+        <li style={`--i:${links.length}`}><a href="#rezervacija" data-menu-link>Rezervacija</a></li>
+      </ul>
+    </nav>
+    <div class="mobile-menu__foot">
+      <a class="btn btn--primary" href={business.phone.tel}><Icon name="phone" size={18} /> {business.phone.display}</a>
+      <div class="mobile-menu__social">
+        <a href={business.links.instagram} target="_blank" rel="noopener" aria-label="Instagram"><Icon name="instagram" /></a>
+        <a href={business.links.facebook} target="_blank" rel="noopener" aria-label="Facebook"><Icon name="facebook" /></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: var(--z-header);
+    background: transparent;
+    transition:
+      background-color var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+  }
+  .site-header.is-solid {
+    background: rgb(18 17 16 / 0.92);
+    box-shadow: 0 1px 0 var(--rule);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+  :global(html.intro-on) .site-header {
+    transform: translateY(-100%);
+  }
+  .site-header__bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+    height: var(--header-h);
+  }
+  .site-header__logo {
+    display: block;
+    width: 92px;
+    color: var(--dough);
+    margin-right: auto;
+    padding: 6px 0;
+    border-radius: var(--radius-s);
+  }
+  .site-header__nav,
+  .site-header__cta {
+    display: none;
+  }
+  .site-header__nav ul {
+    display: flex;
+    gap: var(--space-m);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .site-header__nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-min);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--dough-muted);
+    transition: color var(--dur-fast);
+  }
+  .site-header__nav a:hover {
+    color: var(--dough);
+  }
+  .site-header__cta {
+    min-height: 38px;
+    padding-inline: 1rem;
+  }
+  .site-header__toggle {
+    display: grid;
+    place-items: center;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    margin-right: -10px;
+    border: 0;
+    background: none;
+    color: var(--dough);
+  }
+  .burger {
+    position: relative;
+    display: block;
+    width: 22px;
+    height: 14px;
+  }
+  .burger span {
+    position: absolute;
+    left: 0;
+    height: 1.6px;
+    width: 100%;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform var(--dur-base) var(--ease-out), opacity var(--dur-fast), width var(--dur-base);
+  }
+  .burger span:nth-child(1) { top: 0; }
+  .burger span:nth-child(2) { top: 6px; width: 70%; }
+  .burger span:nth-child(3) { top: 12px; }
+  [aria-expanded='true'] .burger span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  [aria-expanded='true'] .burger span:nth-child(2) { opacity: 0; }
+  [aria-expanded='true'] .burger span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .mobile-menu {
+    position: fixed;
+    inset: var(--header-h) 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-l) var(--gutter) calc(var(--space-l) + env(safe-area-inset-bottom));
+    background: var(--ink);
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 420ms var(--ease-in-out);
+  }
+  .mobile-menu.is-open {
+    clip-path: inset(0 0 0 0);
+  }
+  .mobile-menu ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .mobile-menu li {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 360ms var(--ease-out), transform 360ms var(--ease-out);
+    transition-delay: calc(80ms + var(--i) * 45ms);
+  }
+  .mobile-menu.is-open li {
+    opacity: 1;
+    transform: none;
+  }
+  .mobile-menu a[data-menu-link] {
+    display: block;
+    padding: 0.45rem 0;
+    font-family: var(--font-serif);
+    font-size: 1.85rem;
+    line-height: 1.2;
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+  .mobile-menu__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+  }
+  .mobile-menu__social {
+    display: flex;
+    gap: var(--space-2xs);
+  }
+  .mobile-menu__social a {
+    display: grid;
+    place-items: center;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+  }
+
+  @media (min-width: 60rem) {
+    .site-header__nav,
+    .site-header__cta {
+      display: flex;
+    }
+    .site-header__toggle,
+    .mobile-menu {
+      display: none;
+    }
+    .site-header__logo {
+      width: 104px;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')!;
+  const toggle = header.querySelector<HTMLButtonElement>('[data-menu-toggle]')!;
+  const label = header.querySelector<HTMLElement>('[data-menu-label]')!;
+  const menu = header.querySelector<HTMLElement>('[data-mobile-menu]')!;
+
+  // Solid background once the hero is scrolled past a little.
+  const onScroll = () => header.classList.toggle('is-solid', window.scrollY > 40);
+  onScroll();
+  addEventListener('scroll', onScroll, { passive: true });
+
+  const setOpen = (open: boolean) => {
+    toggle.setAttribute('aria-expanded', String(open));
+    label.textContent = open ? 'Zatvori meni' : 'Otvori meni';
+    document.documentElement.classList.toggle('menu-open', open);
+    header.classList.toggle('is-solid', open || window.scrollY > 40);
+    if (open) {
+      menu.hidden = false;
+      requestAnimationFrame(() => requestAnimationFrame(() => menu.classList.add('is-open')));
+      menu.querySelector<HTMLElement>('a')?.focus({ preventScroll: true });
+    } else {
+      menu.classList.remove('is-open');
+      setTimeout(() => {
+        if (!menu.classList.contains('is-open')) menu.hidden = true;
+      }, 430);
+    }
+  };
+  toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+  menu.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) setOpen(false);
+  });
+  addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
+</script>

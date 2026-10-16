@@ -1,0 +1,130 @@
+---
+import Icon from '../ui/Icon.astro';
+import { business } from '../../data/business';
+import { reviews } from '../../data/reviews';
+import { formatDecimalSR, formatDateSR } from '../../lib/format';
+
+const { value, count, lastUpdated } = business.googleRating;
+const full = Math.floor(value);
+const frac = value - full;
+---
+
+<section class="section reviews theme-ink" id="recenzije" aria-labelledby="recenzije-title">
+  <div class="container reviews__grid">
+    <div class="reviews__score">
+      <p class="eyebrow">Recenzije</p>
+      <h2 id="recenzije-title">Šta kažu gosti</h2>
+      <p class="score">
+        <span class="score__value">{formatDecimalSR(value)}</span>
+        <span class="score__stars" aria-hidden="true" style={`--fill:${((full + frac) / 5) * 100}%`}>
+          <span>★★★★★</span>
+        </span>
+        <span class="visually-hidden">od 5 zvezdica,</span>
+        <span class="score__count">{count} recenzija na Google-u</span>
+      </p>
+      <p class="score__note">Stanje na dan {formatDateSR(lastUpdated)}</p>
+      <a class="btn btn--ghost" href={business.links.googleMaps} target="_blank" rel="noopener">
+        Sve recenzije na Google mapama <Icon name="external" size={16} />
+      </a>
+    </div>
+    <ul class="reviews__list">
+      {
+        reviews.map((r) => (
+          <li>
+            <figure class="review">
+              <blockquote lang={r.lang}>
+                <p>{r.text}</p>
+              </blockquote>
+              <figcaption>{r.author} · Google</figcaption>
+            </figure>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .reviews__grid {
+    display: grid;
+    gap: var(--space-l);
+  }
+  h2 {
+    margin-block: var(--space-2xs) var(--space-s);
+  }
+  .score {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+  }
+  .score__value {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    line-height: 1;
+    font-weight: 600;
+  }
+  .score__stars {
+    position: relative;
+    font-size: 1.25rem;
+    letter-spacing: 0.12em;
+    color: rgb(242 232 213 / 0.22);
+  }
+  .score__stars span {
+    background: linear-gradient(90deg, #e9b44c var(--fill), transparent var(--fill));
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .score__count {
+    flex-basis: 100%;
+    color: var(--fg-muted);
+  }
+  .score__note {
+    margin: var(--space-2xs) 0 var(--space-m);
+    font-size: var(--fs-micro);
+    color: var(--fg-muted);
+  }
+  .reviews__list {
+    display: grid;
+    gap: var(--space-s);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .review {
+    position: relative;
+    margin: 0;
+    padding: var(--space-m) var(--space-m) var(--space-m) calc(var(--space-m) + 0.75rem);
+    border-radius: var(--radius-l);
+    background: var(--panel);
+  }
+  .review::before {
+    content: '“';
+    position: absolute;
+    left: 0.85rem;
+    top: 0.35rem;
+    font-family: var(--font-serif);
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--accent-text);
+  }
+  .review blockquote {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    line-height: 1.45;
+  }
+  .review figcaption {
+    margin-top: var(--space-xs);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--fg-muted);
+  }
+  @media (min-width: 60rem) {
+    .reviews__grid {
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+  }
+</style>

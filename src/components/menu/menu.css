@@ -1,0 +1,364 @@
+/* Menu cards — themes, motifs, aroma layer. Animations only use transform/opacity. */
+
+/* Tilt (-1 … 1): gyroscope writes these on the section, mouse on a single card. */
+[data-menu] {
+  --tx: 0;
+  --ty: 0;
+}
+
+.mcard {
+  --card-w: min(76vw, 18.5rem);
+  --p: 0; /* swipe offset from the snap position, set by JS (-1 … 1) */
+  flex: 0 0 var(--card-w);
+  scroll-snap-align: start;
+  perspective: 1100px;
+  contain: layout style;
+}
+.mcard__inner {
+  position: relative;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 640ms var(--ease-out);
+}
+.mcard.is-flipped .mcard__inner {
+  transform: rotateY(180deg);
+}
+.mcard__face {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--dough);
+  box-shadow: var(--shadow-card);
+}
+.mcard__back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  padding: var(--space-m);
+  gap: var(--space-xs);
+  background: var(--dough-deep);
+  color: var(--ink);
+}
+.mcard__back h4 {
+  font-size: var(--fs-h3);
+}
+.mcard__back ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+.mcard__back .mcard__flip {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+/* ---- Art area ----------------------------------------------------------- */
+.mcard__art {
+  position: relative;
+  aspect-ratio: 4 / 3.5;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 20% 0%, rgb(255 255 255 / 0.16), transparent 60%),
+    linear-gradient(155deg, var(--from) 0%, var(--to) 100%);
+  color: var(--ink);
+}
+.mcard--dark .mcard__art {
+  color: var(--dough);
+}
+.mcard__grain {
+  position: absolute;
+  inset: 0;
+  background-image: var(--dough-tex);
+  background-size: 192px;
+  mix-blend-mode: multiply;
+  opacity: 0.32;
+}
+.mcard--dark .mcard__grain {
+  mix-blend-mode: soft-light;
+  opacity: 0.5;
+}
+.mcard__pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+}
+
+/* Category identities */
+.mcard--dorucak .mcard__pattern {
+  /* soft morning light */
+  background: radial-gradient(70% 55% at 85% 0%, rgb(255 244 214 / 0.95), transparent 70%);
+  opacity: 0.9;
+}
+.mcard--paste-vojvodjanski .mcard__pattern {
+  /* wheat-field lines + faint embroidery-inspired lattice */
+  background:
+    repeating-linear-gradient(100deg, transparent 0 13px, rgb(62 107 58 / 0.16) 13px 14px),
+    conic-gradient(from 45deg at 50% 50%, rgb(62 107 58 / 0.12) 0 25%, transparent 0 50%, rgb(198 58 34 / 0.08) 0 75%, transparent 0) 0 0 / 22px 22px;
+  -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
+  mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
+  opacity: 1;
+}
+.mcard--paste-more .mcard__pattern {
+  /* fine wave lines */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='14'%3E%3Cpath d='M0 7c7.5-6 15-6 22.5 0S37.5 13 45 7 52.5 1 60 7' fill='none' stroke='%23ffffff' stroke-opacity='.22' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 60px 14px;
+  opacity: 1;
+}
+
+/* ---- Motifs ------------------------------------------------------------- */
+.mcard__motifs {
+  position: absolute;
+  inset: 0;
+}
+.motif {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: calc(0.45 + var(--d) * 0.5);
+  transform: translate3d(
+      calc(-50% + (var(--p) * -38px + var(--tx) * 14px) * var(--d)),
+      calc(-50% + var(--ty) * 12px * var(--d)),
+      0
+    )
+    rotate(var(--r));
+  transition: transform 500ms var(--ease-out);
+  will-change: transform;
+}
+.mcard__motifs .motif:first-child {
+  stroke-width: 1;
+  opacity: 0.95;
+}
+.mcard__abstract {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 72%;
+  overflow: visible;
+  filter: drop-shadow(0 6px 6px rgb(0 0 0 / 0.28));
+  transform: translate3d(calc(-50% + (var(--p) * -30px + var(--tx) * 12px)), calc(-50% + var(--ty) * 10px), 0);
+  transition: transform 500ms var(--ease-out);
+}
+
+/* ---- Label -------------------------------------------------------------- */
+.mcard__label {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: var(--space-s) var(--space-s) var(--space-s);
+  background: var(--dough);
+  color: var(--ink);
+  border-top: 1px solid rgb(18 17 16 / 0.08);
+}
+.mcard__name {
+  font-size: 1.28rem;
+  line-height: 1.15;
+}
+.mcard__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  margin-top: auto;
+  padding-top: 0.2rem;
+}
+.mcard__price {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--tomato-text);
+}
+.mcard__flip {
+  min-height: var(--tap-min);
+  padding: 0 0.9rem;
+  border: 1px solid rgb(18 17 16 / 0.2);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-size: var(--fs-small);
+  font-weight: 650;
+}
+.mcard__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.12rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.tag--popular {
+  background: rgb(198 58 34 / 0.12);
+  color: var(--tomato-text);
+}
+.tag--special {
+  background: var(--tomato);
+  color: var(--on-tomato);
+}
+.tag--vege {
+  background: var(--basil-soft);
+  color: var(--basil-text);
+}
+
+/* ---- Aroma layer -------------------------------------------------------- */
+.aroma {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.aroma span {
+  position: absolute;
+  animation-play-state: paused;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-delay: calc(var(--n) * -0.9s);
+  will-change: transform, opacity;
+  opacity: 0;
+}
+.mcard.is-live .aroma span {
+  animation-play-state: running;
+}
+
+/* steam: soft wisps rising from the plate */
+.aroma--steam span {
+  left: calc(30% + var(--n) * 6%);
+  bottom: 18%;
+  width: 26px;
+  height: 70px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0));
+  animation-name: steam;
+  animation-duration: 5.6s;
+}
+@keyframes steam {
+  0% { transform: translate3d(0, 20px, 0) scale(0.6, 0.7); opacity: 0; }
+  25% { opacity: 0.75; }
+  60% { transform: translate3d(8px, -60px, 0) scale(1, 1.15); opacity: 0.4; }
+  100% { transform: translate3d(-6px, -120px, 0) scale(1.3, 1.4); opacity: 0; }
+}
+
+/* poppy seeds: slow drift */
+.aroma--poppy span {
+  left: calc(8% + var(--n) * 13%);
+  top: -6%;
+  width: 4px;
+  height: 3px;
+  border-radius: 50%;
+  background: #262a33;
+  animation-name: drift;
+  animation-duration: 7s;
+}
+@keyframes drift {
+  0% { transform: translate3d(0, 0, 0) rotate(0); opacity: 0; }
+  15% { opacity: 0.85; }
+  100% { transform: translate3d(28px, 240px, 0) rotate(240deg); opacity: 0; }
+}
+
+/* chili: tiny sparks */
+.aroma--chili span {
+  left: calc(14% + var(--n) * 11%);
+  bottom: 22%;
+  width: 3px;
+  height: 7px;
+  border-radius: 2px;
+  background: #e0573c;
+  animation-name: spark;
+  animation-duration: 3.2s;
+}
+@keyframes spark {
+  0% { transform: translate3d(0, 0, 0) rotate(0); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate3d(14px, -90px, 0) rotate(160deg); opacity: 0; }
+}
+
+/* bubbles: seafood & drinks */
+.aroma--bubbles span {
+  left: calc(10% + var(--n) * 12%);
+  bottom: -8%;
+  width: calc(6px + var(--n) * 1.5px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 0.65);
+  animation-name: bubble;
+  animation-duration: 6s;
+}
+@keyframes bubble {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  20% { opacity: 0.9; }
+  50% { transform: translate3d(6px, -110px, 0); }
+  100% { transform: translate3d(-4px, -240px, 0); opacity: 0; }
+}
+
+/* cheese snow */
+.aroma--cheese span {
+  left: calc(6% + var(--n) * 14%);
+  top: -6%;
+  width: 7px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: #fff4cf;
+  animation-name: drift;
+  animation-duration: 6.4s;
+}
+
+/* morning sun: slow glow */
+.aroma--sun span {
+  right: 6%;
+  top: -14%;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 236 180 / 0.9), rgb(255 236 180 / 0));
+  animation-name: glow;
+  animation-duration: 6s;
+}
+.aroma--sun span:not(:first-child) {
+  display: none;
+}
+@keyframes glow {
+  0%, 100% { transform: scale(0.9); opacity: 0.55; }
+  50% { transform: scale(1.08); opacity: 0.95; }
+}
+
+/* herbs: little green flecks */
+.aroma--herbs span {
+  left: calc(6% + var(--n) * 14%);
+  top: -6%;
+  width: 6px;
+  height: 3.5px;
+  border-radius: 6px 0;
+  background: #6f9b5f;
+  animation-name: drift;
+  animation-duration: 7.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aroma {
+    display: none;
+  }
+  .motif,
+  .mcard__abstract,
+  .mcard__inner {
+    transition: none;
+  }
+}

@@ -1,0 +1,55 @@
+---
+/**
+ * A tagliatelle "nest" drawn with the dough texture — used as the art for
+ * photo slots that are still empty (Ludi Sremac, garden). Pure SVG, no request
+ * beyond the shared texture.
+ */
+interface Props {
+  class?: string;
+  loops?: number;
+  seed?: number;
+}
+const { class: cls, loops = 5, seed = 7 } = Astro.props;
+
+// Deterministic pseudo-random for a hand-wound, slightly irregular spiral.
+let s = seed;
+const rand = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+
+const cx = 200;
+const cy = 200;
+const pts: [number, number][] = [];
+const steps = loops * 36;
+for (let i = 0; i <= steps; i++) {
+  const t = i / steps;
+  const a = t * loops * Math.PI * 2;
+  const r = 34 + t * 128 + Math.sin(a * 3 + seed) * 4 + (rand() - 0.5) * 3;
+  pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r * 0.9]);
+}
+// Catmull-Rom -> cubic Bézier for a smooth ribbon.
+let d = `M${pts[0]![0].toFixed(1)} ${pts[0]![1].toFixed(1)}`;
+for (let i = 0; i < pts.length - 1; i++) {
+  const p0 = pts[i - 1] ?? pts[i]!;
+  const p1 = pts[i]!;
+  const p2 = pts[i + 1]!;
+  const p3 = pts[i + 2] ?? p2;
+  const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+  const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+  d += `C${c1[0]!.toFixed(1)} ${c1[1]!.toFixed(1)} ${c2[0]!.toFixed(1)} ${c2[1]!.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+}
+---
+
+<svg class:list={['nest', cls]} viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+  <ellipse cx="200" cy="214" rx="170" ry="150" fill="rgb(0 0 0 / 0.28)" filter="url(#dough-lite)" opacity="0.6"></ellipse>
+  <path d={d} fill="none" stroke="rgb(96 64 24 / 0.45)" stroke-width="21" stroke-linecap="round" transform="translate(1.5 3)"></path>
+  <path d={d} fill="none" stroke="url(#dough)" stroke-width="18" stroke-linecap="round"></path>
+  <path d={d} fill="none" stroke="rgb(255 250 235 / 0.55)" stroke-width="1.6" stroke-linecap="round" transform="translate(-2 -5.5)"></path>
+</svg>
+
+<style>
+  .nest {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+</style>

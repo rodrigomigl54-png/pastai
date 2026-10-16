@@ -1,0 +1,123 @@
+---
+import Photo from '../ui/Photo.astro';
+import Icon from '../ui/Icon.astro';
+import { business } from '../../data/business';
+
+/**
+ * Only verified facts: pasta restaurant on Trg republike, inside Riblja pijaca,
+ * homemade pasta, garden.
+ * TODO: tekst od vlasnika — the restaurant's own story replaces/extends the lead.
+ */
+const ownerStory: string | null = null;
+---
+
+<section class="section about theme-dough" id="o-nama" aria-labelledby="o-nama-title">
+  <div class="container about__grid">
+    <div class="about__text">
+      <p class="eyebrow">O nama</p>
+      <h2 id="o-nama-title">Domaća pasta, usred Riblje pijace</h2>
+      <p class="about__lead">
+        Pastai je pasta bar na Trgu republike u Novom Sadu, u sklopu Riblje pijace. Pastu pravimo sami, a kada je
+        lepo vreme, sto vas čeka i u bašti.
+      </p>
+      {ownerStory && <p class="about__story">{ownerStory}</p>}
+
+      <ul class="about__facts" aria-label="Usluge">
+        {
+          business.services.map((s) => (
+            <li>
+              <Icon name="check" size={16} /> {s}
+            </li>
+          ))
+        }
+      </ul>
+      <dl class="about__meta">
+        <div>
+          <dt>Adresa</dt>
+          <dd>{business.address.street}, {business.address.note}</dd>
+        </div>
+        <div>
+          <dt>Cene</dt>
+          <dd>{business.priceRange.label}</dd>
+        </div>
+      </dl>
+    </div>
+    <div class="about__art" aria-hidden="true">
+      <Photo file="spaghetti-viljuska" alt="" sizes="(min-width: 60rem) 34rem, 92vw" class="about__img" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .about__grid {
+    display: grid;
+    gap: var(--space-l);
+    align-items: center;
+  }
+  h2 {
+    margin-block: var(--space-2xs) var(--space-s);
+  }
+  .about__lead {
+    font-size: var(--fs-lead);
+    max-width: var(--text-max);
+  }
+  .about__story {
+    margin-top: var(--space-s);
+    color: var(--fg-muted);
+  }
+  .about__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin: var(--space-m) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .about__facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: var(--basil-soft);
+    color: var(--basil-text);
+    font-size: var(--fs-small);
+    font-weight: 600;
+  }
+  .about__meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-s);
+    margin: var(--space-m) 0 0;
+    padding-top: var(--space-s);
+    border-top: 1px solid var(--rule);
+  }
+  .about__meta dt {
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+  .about__meta dd {
+    margin: 0.15rem 0 0;
+    font-size: var(--fs-small);
+    font-weight: 550;
+  }
+  .about__art {
+    background: var(--dough);
+  }
+  .about__art :global(.about__img) {
+    width: 100%;
+    height: auto;
+    background: none !important;
+    /* The white studio background melts into the dough-cream panel. */
+    mix-blend-mode: multiply;
+  }
+  @media (min-width: 60rem) {
+    .about__grid {
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: var(--space-xl);
+    }
+  }
+</style>

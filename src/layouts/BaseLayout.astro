@@ -1,0 +1,38 @@
+---
+/**
+ * Root document shell. SEO/OG/JSON-LD are completed in phase 6;
+ * this sets the language, fonts, tokens and the preload policy.
+ */
+import '../styles/fonts.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+// Only the above-the-fold heading weight is preloaded (hashed URL via Vite).
+import headingFont from '../assets/fonts/fraunces-500-core.woff2?url';
+
+interface Props {
+  title: string;
+  description: string;
+  noindex?: boolean;
+}
+const { title, description, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="sr-Latn">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#121110" />
+    <link rel="preload" href={headingFont} as="font" type="font/woff2" crossorigin />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#sadrzaj">Preskoči na sadržaj</a>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,90 @@
+/*
+ * Self-hosted fonts (built by scripts/build_fonts.py).
+ * Each family = "core" (Latin) + "sr" (č ć đ š ž + capitals), joined by
+ * unicode-range so the browser only downloads what a page actually uses.
+ * Headings: Fraunces (static cuts, SOFT 50 / opsz 32). Body: Manrope variable.
+ * Fallback faces are metric-matched (size-adjust/ascent/descent) to the
+ * system serif/sans so the swap causes no layout shift.
+ */
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/fraunces-500-core.woff2') format('woff2');
+  unicode-range: U+0020-007E, U+00A0-00FF, U+2013-2026, U+20AC, U+2122, U+2212;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/fraunces-500-sr.woff2') format('woff2');
+  unicode-range: U+0106-0107, U+010C-010D, U+0110-0111, U+0160-0161, U+017D-017E;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/fraunces-500i-core.woff2') format('woff2');
+  unicode-range: U+0020-007E, U+00A0-00FF, U+2013-2026, U+20AC, U+2122, U+2212;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/fraunces-500i-sr.woff2') format('woff2');
+  unicode-range: U+0106-0107, U+010C-010D, U+0110-0111, U+0160-0161, U+017D-017E;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/fonts/fraunces-600-core.woff2') format('woff2');
+  unicode-range: U+0020-007E, U+00A0-00FF, U+2013-2026, U+20AC, U+2122, U+2212;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/fonts/fraunces-600-sr.woff2') format('woff2');
+  unicode-range: U+0106-0107, U+010C-010D, U+0110-0111, U+0160-0161, U+017D-017E;
+}
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('../assets/fonts/manrope-var-core.woff2') format('woff2-variations');
+  unicode-range: U+0020-007E, U+00A0-00FF, U+2013-2026, U+20AC, U+2122, U+2212;
+}
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('../assets/fonts/manrope-var-sr.woff2') format('woff2-variations');
+  unicode-range: U+0106-0107, U+010C-010D, U+0110-0111, U+0160-0161, U+017D-017E;
+}
+
+/* Metric-matched fallbacks (values computed against Liberation/Arial/Times). */
+@font-face {
+  font-family: 'Fraunces Fallback';
+  src: local('Times New Roman'), local('Times'), local('Liberation Serif'), local('Tinos');
+  size-adjust: 118.45%;
+  ascent-override: 82.57%;
+  descent-override: 21.53%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Manrope Fallback';
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans'), local('Roboto');
+  size-adjust: 100.58%;
+  ascent-override: 105.98%;
+  descent-override: 29.83%;
+  line-gap-override: 0%;
+}

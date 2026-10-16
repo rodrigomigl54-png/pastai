@@ -3,8 +3,11 @@ import sitemap from '@astrojs/sitemap';
 import { SITE_URL } from './src/config/site';
 
 // https://docs.astro.build/en/reference/configuration-reference/
+// SITE_URL is the production domain. A preview deploy (GitHub Pages workflow)
+// overrides it with PREVIEW_SITE + BASE_PATH, e.g. https://user.github.io + /pastai.
 export default defineConfig({
-  site: SITE_URL,
+  site: process.env.PREVIEW_SITE ?? SITE_URL,
+  base: process.env.BASE_PATH ?? '/',
   output: 'static',
   trailingSlash: 'ignore',
   integrations: [sitemap()],

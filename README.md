@@ -26,6 +26,14 @@ npm run preview    # serve dist/ locally
 4. Optional caching: files in `/_astro/` have hashed names, so serve them with
    `Cache-Control: public, max-age=31536000, immutable`. `index.html` should not be cached long.
 
+## Preview link (GitHub Pages)
+
+`.github/workflows/preview-pages.yml` builds and deploys every push to `main` to
+`https://<owner>.github.io/<repo>/`. The preview is `noindex` and its robots.txt disallows
+crawling, so it never competes with the real domain.
+One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+Run it by hand under **Actions → Preview (GitHub Pages) → Run workflow**.
+
 ## Editing content
 
 | What | Where |

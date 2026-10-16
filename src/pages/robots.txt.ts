@@ -1,7 +1,10 @@
 import type { APIRoute } from 'astro';
-import { SITE_URL } from '../config/site';
+import { IS_PREVIEW, absoluteUrl } from '../lib/url';
 
 export const GET: APIRoute = () =>
-  new Response(`User-agent: *\nAllow: /\n\nSitemap: ${new URL('/sitemap-index.xml', SITE_URL).href}\n`, {
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-  });
+  new Response(
+    IS_PREVIEW
+      ? 'User-agent: *\nDisallow: /\n'
+      : `User-agent: *\nAllow: /\n\nSitemap: ${absoluteUrl('/sitemap-index.xml')}\n`,
+    { headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
+  );
